@@ -1,68 +1,152 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+@extends('layouts.frontend')
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Laravel') }}</title>
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
-</head>
-
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+@section('content')
+    <!-- Hero Section -->
+    <section class="hero-gradient text-center animate-fade-in shadow-lg">
         <div class="container">
-            <a class="navbar-brand" href="#">{{ config('app.name', 'Laravel') }}</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    @auth
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url('/dashboard') }}">Dashboard</a>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">Log in</a>
-                        </li>
-                        @if (Route::has('register'))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('register') }}">Register</a>
-                            </li>
-                        @endif
-                    @endauth
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container py-5">
-        <div class="row min-vh-75 align-items-center">
-            <div class="col-lg-6">
-                <h1 class="display-4 fw-bold">Welcome to Example Shop</h1>
-                <p class="lead text-muted">A modern ecommerce experience built with Laravel 12 and Bootstrap 5.</p>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                    <a href="{{ route('register') }}" class="btn btn-primary btn-lg px-4 me-md-2">Get Started</a>
-                    <a href="{{ route('login') }}" class="btn btn-outline-secondary btn-lg px-4">Log In</a>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="display-3 fw-extrabold mb-4">Discover Your Future Style</h1>
+                    <p class="lead mb-5 opacity-75 fs-4">Explore our curated collection of premium products designed for the
+                        modern individual.</p>
+                    <a href="#products" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm">
+                        Shop Now <i class="bi bi-arrow-right-short"></i>
+                    </a>
                 </div>
             </div>
-            <div class="col-lg-6 mt-4 mt-lg-0">
-                <div class="card shadow border-0">
-                    <div class="card-body p-5 text-center bg-light rounded">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor"
-                            class="bi bi-cart4 text-primary mb-3" viewBox="0 0 16 16">
-                            <path
-                                d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l.5 2H5V5H3.14zM6 5v2h2V5H6zm3 0v2h2V5H9zm3 0v2h1.36l.5-2H12zm1.11 3H12v2h.61l.5-2zM11 8H9v2h2V8zM8 8H6v2h2V8zM5 8H3.89l.5 2H5V8zm0 5a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z" />
-                        </svg>
-                        <h3>Browse Products</h3>
-                        <p>Explore our premium collection of products.</p>
-                        <button class="btn btn-primary">Shop Now</button>
+        </div>
+    </section>
+
+    <div class="container" id="products">
+        <div class="row">
+            <!-- Sidebar Filters -->
+            <div class="col-md-3">
+                <div class="sidebar-section shadow-sm mb-4 animate-fade-in">
+                    <h5 class="fw-bold mb-4">Categories</h5>
+                    <div class="list-group list-group-flush border-0">
+                        <a href="{{ route('home') }}"
+                            class="list-group-item list-group-item-action {{ !request('category') ? 'active text-white' : '' }}">
+                            <i class="bi bi-grid-fill me-2"></i>All Products
+                        </a>
+                        @foreach($categories as $category)
+                            <a href="{{ route('home', ['category' => $category->slug]) }}"
+                                class="list-group-item list-group-item-action {{ request('category') == $category->slug ? 'active text-white' : '' }}">
+                                <i class="bi bi-chevron-right me-2 small"></i>{{ $category->name }}
+                            </a>
+                        @endforeach
                     </div>
+                </div>
+
+                <div class="sidebar-section shadow-sm animate-fade-in" style="animation-delay: 0.1s;">
+                    <h5 class="fw-bold mb-4">Refine by Price</h5>
+                    <form action="{{ route('home') }}" method="GET">
+                        @if(request('category'))
+                            <input type="hidden" name="category" value="{{ request('category') }}">
+                        @endif
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-uppercase text-muted">Price Range</label>
+                            <div class="input-group mb-2 shadow-sm">
+                                <span class="input-group-text bg-white border-end-0"><i
+                                        class="bi bi-currency-dollar"></i></span>
+                                <input type="number" name="min_price" class="form-control border-start-0 ps-0"
+                                    placeholder="Min" value="{{ request('min_price') }}">
+                            </div>
+                            <div class="input-group shadow-sm">
+                                <span class="input-group-text bg-white border-end-0"><i
+                                        class="bi bi-currency-dollar"></i></span>
+                                <input type="number" name="max_price" class="form-control border-start-0 ps-0"
+                                    placeholder="Max" value="{{ request('max_price') }}">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-premium w-100 rounded-pill mb-3">Apply Filter</button>
+                        <a href="{{ route('home') }}" class="btn btn-link w-100 text-muted text-decoration-none small">Clear
+                            All</a>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="col-md-9">
+                <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3 animate-fade-in">
+                    <h2 class="fw-extrabold mb-0">Our Collection</h2>
+                    <div class="dropdown">
+                        <button
+                            class="btn btn-white bg-white shadow-sm border rounded-pill px-4 py-2 dropdown-toggle fw-bold"
+                            type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-sort-down me-2 text-primary"></i>
+                            {{ request('sort') == 'price_asc' ? 'Lower Price First' : (request('sort') == 'price_desc' ? 'Highest Price First' : 'Newly Added') }}
+                        </button>
+                        <ul class="dropdown-menu border-0 shadow-lg mt-2">
+                            <li><a class="dropdown-item py-2"
+                                    href="{{ request()->fullUrlWithQuery(['sort' => 'newest']) }}"><i
+                                        class="bi bi-clock me-2"></i>Newly Added</a></li>
+                            <li><a class="dropdown-item py-2"
+                                    href="{{ request()->fullUrlWithQuery(['sort' => 'price_asc']) }}"><i
+                                        class="bi bi-sort-numeric-down me-2"></i>Lower Price First</a></li>
+                            <li><a class="dropdown-item py-2"
+                                    href="{{ request()->fullUrlWithQuery(['sort' => 'price_desc']) }}"><i
+                                        class="bi bi-sort-numeric-up-alt me-2"></i>Highest Price First</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    @forelse($products as $index => $product)
+                        <div class="col-md-4 animate-fade-in" style="animation-delay: {{ 0.1 * ($index % 3) }}s;">
+                            <div class="premium-card h-100 shadow-sm border-0">
+                                <div class="card-img-wrapper">
+                                    <a href="{{ route('product.show', $product->slug) }}">
+                                        @if($product->image_path)
+                                            <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}">
+                                        @else
+                                            <div class="bg-light d-flex align-items-center justify-content-center h-100 w-100">
+                                                <i class="bi bi-image text-muted fs-1"></i>
+                                            </div>
+                                        @endif
+                                    </a>
+                                    @if($product->stock <= 0)
+                                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger rounded-pill shadow-sm">Sold
+                                            Out</span>
+                                    @endif
+                                </div>
+                                <div class="card-body p-4 d-flex flex-column">
+                                    <span
+                                        class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill mb-2 align-self-start small">
+                                        {{ $product->category->name ?? 'Uncategorized' }}
+                                    </span>
+                                    <h5 class="card-title fw-bold mb-3">
+                                        <a href="{{ route('product.show', $product->slug) }}"
+                                            class="text-decoration-none text-dark">{{ $product->name }}</a>
+                                    </h5>
+                                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                                        <span
+                                            class="fs-4 fw-extrabold text-primary">${{ number_format($product->price, 2) }}</span>
+                                        @if($product->stock > 0)
+                                            <a href="{{ route('cart.add', $product->id) }}"
+                                                class="btn btn-premium rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center"
+                                                style="width: 40px; height: 40px;">
+                                                <i class="bi bi-cart-plus fs-5"></i>
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12 py-5 text-center">
+                            <div class="bg-white p-5 rounded-4 shadow-sm">
+                                <i class="bi bi-search display-1 text-muted opacity-25 mb-4"></i>
+                                <h3 class="fw-bold">No results found</h3>
+                                <p class="text-muted">Try adjusting your filters to find what you're looking for.</p>
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
+
+                <div class="mt-5 d-flex justify-content-center">
+                    {{ $products->links() }}
                 </div>
             </div>
         </div>
     </div>
-</body>
-
-</html>
+@endsection
