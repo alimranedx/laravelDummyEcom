@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -12,20 +13,22 @@ class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')->latest()->paginate(15);
+        $products = Product::with(['category', 'brand'])->latest()->paginate(15);
         return view('admin.products.index', compact('products'));
     }
 
     public function create()
     {
         $categories = Category::all();
-        return view('admin.products.create', compact('categories'));
+        $brands = Brand::all();
+        return view('admin.products.create', compact('categories', 'brands'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'category_id' => 'nullable|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
@@ -47,20 +50,22 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load('category');
+        $product->load(['category', 'brand']);
         return view('admin.products.show', compact('product'));
     }
 
     public function edit(Product $product)
     {
         $categories = Category::all();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $brands = Brand::all();
+        return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
             'category_id' => 'nullable|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Brand;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -11,18 +12,20 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::withCount('products')->latest()->paginate(15);
+        $categories = Category::with(['brand'])->withCount('products')->latest()->paginate(15);
         return view('admin.categories.index', compact('categories'));
     }
 
     public function create()
     {
-        return view('admin.categories.create');
+        $brands = Brand::all();
+        return view('admin.categories.create', compact('brands'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'brand_id' => 'nullable|exists:brands,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
@@ -37,18 +40,20 @@ class CategoryController extends Controller
 
     public function show(Category $category)
     {
-        $category->load('products');
+        $category->load(['products', 'brand']);
         return view('admin.categories.show', compact('category'));
     }
 
     public function edit(Category $category)
     {
-        return view('admin.categories.edit', compact('category'));
+        $brands = Brand::all();
+        return view('admin.categories.edit', compact('category', 'brands'));
     }
 
     public function update(Request $request, Category $category)
     {
         $validated = $request->validate([
+            'brand_id' => 'nullable|exists:brands,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);

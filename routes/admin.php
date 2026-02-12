@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\UserController;
@@ -40,6 +41,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Categories
         Route::resource('categories', CategoryController::class)->middleware('can:manage categories');
+
+        // Brands
+        Route::resource('brands', BrandController::class)->middleware('can:manage categories');
 
         // Products
         Route::resource('products', ProductController::class)->middleware('can:manage products');

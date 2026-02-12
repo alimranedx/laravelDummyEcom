@@ -179,6 +179,14 @@
 
                     <div class="sidebar-heading">Management</div>
                     <ul class="nav flex-column">
+                        @can('manage brands')
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}"
+                                    href="{{ route('admin.brands.index') }}">
+                                    <i class="bi bi-patch-check"></i> Brands
+                                </a>
+                            </li>
+                        @endcan
                         @can('manage categories')
                             <li class="nav-item">
                                 <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
