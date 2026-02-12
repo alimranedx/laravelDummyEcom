@@ -30,12 +30,8 @@
                             <tr>
                                 <td>{{ $brand->id }}</td>
                                 <td>
-                                    @if($brand->logo)
-                                        <img src="{{ asset('storage/' . $brand->logo) }}" alt="{{ $brand->name }}"
-                                            style="max-height: 40px;">
-                                    @else
-                                        <span class="text-muted">No Logo</span>
-                                    @endif
+                                    <img src="{{ $brand->logo_url }}" alt="{{ $brand->name }}"
+                                        style="max-height: 40px; border-radius: 4px;">
                                 </td>
                                 <td>{{ $brand->name }}</td>
                                 <td>{{ $brand->slug }}</td>

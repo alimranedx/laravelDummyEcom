@@ -17,6 +17,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Image</th>
                             <th>Name</th>
                             <th>Category</th>
                             <th>Price</th>
@@ -29,6 +30,10 @@
                         @forelse($products as $product)
                             <tr>
                                 <td>{{ $product->id }}</td>
+                                <td>
+                                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}"
+                                        style="max-height: 40px; border-radius: 4px;">
+                                </td>
                                 <td>{{ $product->name }}</td>
                                 <td>{{ $product->category->name ?? 'N/A' }}</td>
                                 <td>${{ number_format($product->price, 2) }}</td>

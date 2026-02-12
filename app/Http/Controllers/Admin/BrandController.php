@@ -69,6 +69,12 @@ class BrandController extends Controller
             ->with('success', 'Brand updated successfully.');
     }
 
+    public function getCategories(Brand $brand)
+    {
+        $categories = $brand->categories()->select('id', 'name')->get();
+        return response()->json($categories);
+    }
+
     public function destroy(Brand $brand)
     {
         if ($brand->logo) {

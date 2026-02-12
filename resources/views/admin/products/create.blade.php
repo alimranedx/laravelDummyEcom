@@ -11,10 +11,17 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
-                                name="name" value="{{ old('name') }}" required>
-                            @error('name')
+                            <label for="brand_id" class="form-label">Brand</label>
+                            <select class="form-select @error('brand_id') is-invalid @enderror" id="brand_id"
+                                name="brand_id" onchange="loadCategories(this.value)">
+                                <option value="">Select Brand</option>
+                                @foreach($brands as $brand)
+                                    <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('brand_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -25,9 +32,16 @@
                                 name="category_id">
                                 <option value="">Select Category</option>
                                 @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
+                                    @if(old('brand_id') && $category->brand_id == old('brand_id'))
+                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @elseif(!old('brand_id'))
+                                        {{-- Initially empty or show all if you prefer, but requirement says "as per brand" --}}
+                                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endif
                                 @endforeach
                             </select>
                             @error('category_id')
@@ -36,17 +50,10 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="brand_id" class="form-label">Brand</label>
-                            <select class="form-select @error('brand_id') is-invalid @enderror" id="brand_id"
-                                name="brand_id">
-                                <option value="">Select Brand</option>
-                                @foreach($brands as $brand)
-                                    <option value="{{ $brand->id }}" {{ old('brand_id') == $brand->id ? 'selected' : '' }}>
-                                        {{ $brand->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('brand_id')
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
+                                name="name" value="{{ old('name') }}" required>
+                            @error('name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
@@ -98,4 +105,26 @@
             </div>
         </div>
     </div>
+@push('scripts')
+<script>
+    function loadCategories(brandId) {
+        const categorySelect = document.getElementById('category_id');
+        categorySelect.innerHTML = '<option value="">Select Category</option>';
+        
+        if (!brandId) return;
+
+        fetch(`/admin/brands/${brandId}/categories`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching categories:', error));
+    }
+</script>
+@endpush
 @endsection

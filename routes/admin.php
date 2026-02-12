@@ -44,6 +44,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Brands
         Route::resource('brands', BrandController::class)->middleware('can:manage categories');
+        Route::get('brands/{brand}/categories', [BrandController::class, 'getCategories'])->name('brands.categories');
 
         // Products
         Route::resource('products', ProductController::class)->middleware('can:manage products');

@@ -23,17 +23,33 @@
 
                 <div class="mb-3">
                     <label for="logo" class="form-label">Logo</label>
-                    @if($brand->logo)
-                        <div class="mb-2">
-                            <img src="{{ asset('storage/' . $brand->logo) }}" alt="{{ $brand->name }}"
-                                style="max-height: 100px;">
-                        </div>
-                    @endif
-                    <input type="file" name="logo" id="logo" class="form-control @error('logo') is-invalid @enderror">
+                    <div class="mb-2" id="logo-preview-container">
+                        <img id="logo-preview" src="{{ $brand->logo_url }}" alt="{{ $brand->name }}"
+                            style="max-height: 100px; border-radius: 4px;">
+                    </div>
+                    <input type="file" name="logo" id="logo" class="form-control @error('logo') is-invalid @enderror"
+                        onchange="previewImage(this, 'logo-preview', 'logo-preview-container')">
                     @error('logo')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+                @push('scripts')
+                    <script>
+                        function previewImage(input, previewId, containerId) {
+                            const preview = document.getElementById(previewId);
+                            const container = document.getElementById(containerId);
+
+                            if (input.files && input.files[0]) {
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    preview.src = e.target.result;
+                                    container.classList.remove('d-none');
+                                }
+                                reader.readAsDataURL(input.files[0]);
+                            }
+                        }
+                    </script>
+                @endpush
 
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>

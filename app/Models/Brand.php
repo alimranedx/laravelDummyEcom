@@ -11,6 +11,14 @@ class Brand extends Model
 
     protected $fillable = ['name', 'slug', 'logo', 'description'];
 
+    public function getLogoUrlAttribute()
+    {
+        if ($this->logo) {
+            return asset('storage/' . $this->logo);
+        }
+        return asset('images/placeholder-brand.png');
+    }
+
     public function categories()
     {
         return $this->hasMany(Category::class);

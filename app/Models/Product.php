@@ -12,6 +12,14 @@ class Product extends Model
 
     protected $fillable = ['category_id', 'brand_id', 'name', 'slug', 'description', 'price', 'stock', 'image_path'];
 
+    public function getImageUrlAttribute()
+    {
+        if ($this->image_path) {
+            return asset('storage/' . $this->image_path);
+        }
+        return asset('images/placeholder-product.png');
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class);
