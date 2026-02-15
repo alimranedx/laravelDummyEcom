@@ -61,12 +61,19 @@ This will set up the table structure and create the default roles and administra
 php artisan migrate --seed
 ```
 
-### 6. Compile Assets
+### 6. Storage Link
+This will set up storage link and cache config
+```bash
+php artisan storage:link
+php artisan config:cache
+```
+
+### 7. Compile Assets
 ```bash
 npm run dev
 ```
 
-### 7. Start the Server
+### 8. Start the Server
 ```bash
 php artisan serve
 ```
