@@ -17,6 +17,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
+                            <th>Brand</th>
                             <th>Name</th>
                             <th>Slug</th>
                             <th>Products</th>
@@ -28,6 +29,7 @@
                         @forelse($categories as $category)
                             <tr>
                                 <td>{{ $category->id }}</td>
+                                <td>{{ $category->brand ? $category->brand->name : '-' }}</td>
                                 <td>{{ $category->name }}</td>
                                 <td>{{ $category->slug }}</td>
                                 <td>{{ $category->products_count }}</td>
