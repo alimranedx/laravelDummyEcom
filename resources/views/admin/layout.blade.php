@@ -109,7 +109,9 @@
                                       ->where('model_has_roles.model_id', $user->id)
                                       ->where('model_has_roles.model_type', get_class($user));
                                 })->orderBy('sequence');
-                            }])->whereHas('subModules', function($query) use ($user) {
+                            }])
+                            ->where('name', '!=', 'RBAC')
+                            ->whereHas('subModules', function($query) use ($user) {
                                 $query->whereExists(function ($q) use ($user) {
                                     $q->select(DB::raw(1))
                                       ->from('pages')
@@ -121,47 +123,29 @@
                                 });
                             })->orderBy('sequence')->get();
                         }
+
+                        $isDashboardActive = request()->routeIs('admin.dashboard');
                     @endphp
 
+                    <li class="nav-item mb-2">
+                        <a class="nav-link d-flex align-items-center {{ $isDashboardActive ? 'active' : '' }}" 
+                           href="{{ route('admin.dashboard') }}">
+                            <i class="bi bi-speedometer2 me-2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+
                     @foreach($permittedModules as $module)
+                        @php
+                            $isModuleActive = false;
+                            $currentAction = request()->route()?->getActionName();
+                            if ($currentAction) {
+                                $currentController = ltrim(explode('@', $currentAction)[0] ?? '', '\\');
+                                $isModuleActive = $module->subModules->contains('controller_name', $currentController);
+                            }
+                            $moduleId = Str::slug($module->name) . 'Submenu';
+                        @endphp
                         <li class="nav-item">
-                            @php
-                                $isModuleActive = false;
-                                $subModuleHtml = '';
-                                foreach($module->subModules as $subModule) {
-                                    $isActive = false;
-                                    $routeAction = request()->route()?->getActionName();
-                                    if ($routeAction && str_contains($routeAction, '@')) {
-                                         [$controller, $method] = explode('@', $routeAction);
-                                         if (ltrim($controller, '\\') === $subModule->controller_name) {
-                                             $isActive = true;
-                                             $isModuleActive = true;
-                                         }
-                                    }
-
-                                    $routeName = 'admin.' . strtolower($subModule->name) . '.index';
-                                    if (!Route::has($routeName)) {
-                                         if ($subModule->name == 'Admins') $routeName = 'admin.admin-management.index';
-                                         elseif ($subModule->name == 'Regular Users') $routeName = 'admin.user-management.index';
-                                         elseif ($subModule->name == 'Role Permission Association' || $subModule->name == 'Role Associations') $routeName = 'admin.role-permissions.index';
-                                         elseif ($subModule->name == 'Admin User Role' || $subModule->name == 'Admin User Roles') $routeName = 'admin.admin-user-roles.index';
-                                         elseif ($subModule->name == 'Dashboard') $routeName = 'admin.dashboard';
-                                         elseif ($subModule->name == 'Role') $routeName = 'admin.roles.index';
-                                         elseif ($subModule->name == 'Permission') $routeName = 'admin.permissions.index';
-                                    }
-                                    
-                                    $subModuleUrl = Route::has($routeName) ? route($routeName) : '#';
-                                    $activeClass = $isActive ? 'text-primary fw-bold' : 'opacity-75';
-                                    
-                                    $subModuleHtml .= '<li class="nav-item">
-                                        <a class="nav-link py-1 ' . $activeClass . '" href="' . $subModuleUrl . '">
-                                            <i class="' . $subModule->icon . ' me-2"></i> ' . $subModule->display_name . '
-                                        </a>
-                                    </li>';
-                                }
-                                $moduleId = Str::slug($module->name) . 'Submenu';
-                            @endphp
-
                             <a class="nav-link d-flex align-items-center {{ $isModuleActive ? 'active' : '' }}" 
                                data-bs-toggle="collapse" href="#{{ $moduleId }}" role="button" 
                                aria-expanded="{{ $isModuleActive ? 'true' : 'false' }}" aria-controls="{{ $moduleId }}">
@@ -171,14 +155,38 @@
                             </a>
                             <div class="collapse {{ $isModuleActive ? 'show' : '' }} ms-3" id="{{ $moduleId }}">
                                 <ul class="nav flex-column border-start border-secondary border-opacity-25 ms-2 ps-2 mt-1">
-                                    {!! $subModuleHtml !!}
+                                    @foreach($module->subModules as $subModule)
+                                        @php
+                                            $isSubActive = false;
+                                            if ($currentAction) {
+                                                $subController = ltrim(explode('@', $currentAction)[0] ?? '', '\\');
+                                                $isSubActive = ($subController === $subModule->controller_name);
+                                            }
+
+                                            $routeName = 'admin.' . strtolower($subModule->name) . '.index';
+                                            if (!Route::has($routeName)) {
+                                                 if ($subModule->name == 'Admins') $routeName = 'admin.admin-management.index';
+                                                 elseif ($subModule->name == 'Regular Users') $routeName = 'admin.user-management.index';
+                                                 elseif ($subModule->name == 'Role Permission Association' || $subModule->name == 'Role Associations') $routeName = 'admin.role-permissions.index';
+                                                 elseif ($subModule->name == 'Admin User Role' || $subModule->name == 'Admin User Roles') $routeName = 'admin.admin-user-roles.index';
+                                                 elseif ($subModule->name == 'Dashboard') $routeName = 'admin.dashboard';
+                                                 elseif ($subModule->name == 'Role') $routeName = 'admin.roles.index';
+                                                 elseif ($subModule->name == 'Permission') $routeName = 'admin.permissions.index';
+                                            }
+                                            $subModuleUrl = Route::has($routeName) ? route($routeName) : '#';
+                                        @endphp
+                                        <li class="nav-item">
+                                            <a class="nav-link py-1 {{ $isSubActive ? 'text-primary fw-bold' : 'opacity-75' }}" href="{{ $subModuleUrl }}">
+                                                <i class="{{ $subModule->icon }} me-2"></i> {{ $subModule->display_name }}
+                                            </a>
+                                        </li>
+                                    @endforeach
                                 </ul>
                             </div>
                         </li>
                     @endforeach
 
-
-                    <ul class="nav flex-column">
+                    <ul class="nav flex-column mt-4">
                         <li class="nav-item">
                             <form method="POST" action="{{ route('admin.logout') }}" class="d-inline">
                                 @csrf

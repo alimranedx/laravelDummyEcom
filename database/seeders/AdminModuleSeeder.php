@@ -25,17 +25,6 @@ class AdminModuleSeeder extends Seeder
 
         $modules = [
             [
-                'name' => 'Dashboard', 'icon' => 'bi bi-speedometer2', 'sequence' => 1, 'display_name' => 'Dashboard',
-                'sub_modules' => [
-                    [
-                        'name' => 'Dashboard', 'controller' => 'App\Http\Controllers\Admin\DashboardController', 'icon' => 'bi bi-speedometer2', 'sequence' => 1, 'method' => 'index', 'display_name' => 'Dashboard',
-                        'pages' => [
-                            ['name' => 'View Dashboard', 'method' => 'index', 'type' => 2],
-                        ]
-                    ]
-                ]
-            ],
-            [
                 'name' => 'E-Commerce', 'icon' => 'bi bi-shop', 'sequence' => 2, 'display_name' => 'E-Commerce',
                 'sub_modules' => [
                     [
@@ -150,7 +139,9 @@ class AdminModuleSeeder extends Seeder
             // Fallback: If Super Admin doesn't exist, create it or use Admin
             $adminRole = DB::table('roles')->where('name', 'Admin')->first();
             if ($adminRole) {
-                $pages = Page::all();
+                $pages = Page::whereHas('module', function($q) {
+                    $q->where('name', '!=', 'RBAC');
+                })->get();
                 foreach ($pages as $page) {
                     DB::table('role_pages')->insertOrIgnore([
                         'role_id' => $adminRole->id,

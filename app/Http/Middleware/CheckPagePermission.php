@@ -42,14 +42,25 @@ class CheckPagePermission
             // Normalize controller name (remove leading backslash if present)
             $controller = ltrim($controller, '\\');
 
+            // Dashboard is accessible to all admins by default
+            if ($controller === 'App\Http\Controllers\Admin\DashboardController') {
+                return $next($request);
+            }
+
             $page = DB::table('pages')
                 ->join('sub_modules', 'pages.sub_module_id', '=', 'sub_modules.id')
+                ->join('modules', 'pages.module_id', '=', 'modules.id')
                 ->where('sub_modules.controller_name', $controller)
                 ->where('pages.method_name', $method)
-                ->select('pages.id')
+                ->select('pages.id', 'modules.name as module_name')
                 ->first();
 
             if ($page) {
+                // \Log::info("Checking permission for user {$user->id} on page {$page->id}");
+                // Hard block RBAC for non-Super Admins
+                if ($page->module_name === 'RBAC') {
+                    abort(403, 'Access denied. The RBAC module is restricted to Super Admins only.');
+                }
                 // Check if user's roles have access to this page via the pivot table
                 // We join with model_has_roles to support multiple roles per user (Spatie default)
                 $hasPermission = DB::table('role_pages')

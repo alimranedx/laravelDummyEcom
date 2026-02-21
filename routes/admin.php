@@ -40,19 +40,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Categories
-        Route::resource('categories', CategoryController::class)->middleware('can:manage categories');
+        Route::resource('categories', CategoryController::class);
 
         // Brands
-        Route::resource('brands', BrandController::class)->middleware('can:manage categories');
+        Route::resource('brands', BrandController::class);
         Route::get('brands/{brand}/categories', [BrandController::class, 'getCategories'])->name('brands.categories');
 
         // Products
-        Route::resource('products', ProductController::class)->middleware('can:manage products');
+        Route::resource('products', ProductController::class);
 
         // Orders
-        Route::get('orders', [OrderController::class, 'index'])->name('orders.index')->middleware('can:manage orders');
-        Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show')->middleware('can:manage orders');
-        Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus')->middleware('can:manage orders');
+        Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::patch('orders/{order}/status', [OrderController::class, 'updateStatus'])->name('orders.updateStatus');
 
 
         // Super Admin only routes: Role & Association

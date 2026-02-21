@@ -22,7 +22,14 @@ class RolePermissionAssociationController extends Controller
 
     public function edit(Role $role)
     {
-        $modules = \App\Models\Module::with('subModules.pages')->orderBy('sequence')->get();
+        $query = \App\Models\Module::with('subModules.pages')->orderBy('sequence');
+        
+        // Only allow RBAC permissions to be assigned to Super Admin role
+        if ($role->name !== 'Super Admin') {
+            $query->where('name', '!=', 'RBAC');
+        }
+        
+        $modules = $query->get();
         $rolePages = \Illuminate\Support\Facades\DB::table('role_pages')
             ->where('role_id', $role->id)
             ->pluck('page_id')
@@ -44,14 +51,27 @@ class RolePermissionAssociationController extends Controller
                 ->delete();
 
             if ($request->has('pages')) {
-                $data = collect($request->pages)->map(function($pageId) use ($role) {
+                $pageIds = $request->pages;
+                
+                // Final safeguard: Filter out RBAC pages if not Super Admin role
+                if ($role->name !== 'Super Admin') {
+                    $rbacPageIds = \App\Models\Page::whereHas('module', function($q) {
+                        $q->where('name', 'RBAC');
+                    })->pluck('id')->toArray();
+                    
+                    $pageIds = array_diff($pageIds, $rbacPageIds);
+                }
+
+                $data = collect($pageIds)->map(function($pageId) use ($role) {
                     return [
                         'role_id' => $role->id,
                         'page_id' => $pageId,
                     ];
                 })->toArray();
                 
-                \Illuminate\Support\Facades\DB::table('role_pages')->insert($data);
+                if (!empty($data)) {
+                    \Illuminate\Support\Facades\DB::table('role_pages')->insert($data);
+                }
             }
         });
 
