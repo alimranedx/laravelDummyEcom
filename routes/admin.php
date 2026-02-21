@@ -36,7 +36,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     // Protected admin routes
-    Route::middleware(['auth', 'admin'])->group(function () {
+    Route::middleware(['auth', 'admin', 'check_page_permission'])->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Categories
@@ -60,8 +60,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // Roles
             Route::resource('roles', RoleController::class);
 
-            // Permissions
-            Route::resource('permissions', PermissionController::class);
+            // Permission management removed as redundant with new page-based system
 
             // User Management
             Route::resource('admin-management', AdminManagementController::class)->parameters(['admin-management' => 'admin']);

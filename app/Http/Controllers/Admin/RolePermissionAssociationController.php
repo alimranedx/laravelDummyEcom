@@ -11,28 +11,51 @@ class RolePermissionAssociationController extends Controller
 {
     public function index()
     {
-        $roles = Role::where('name', '!=', 'user')->with('permissions')->get();
+        $roles = Role::where('name', '!=', 'user')->get();
+        foreach ($roles as $role) {
+            $role->pages_count = \Illuminate\Support\Facades\DB::table('role_pages')
+                ->where('role_id', $role->id)
+                ->count();
+        }
         return view('admin.role-permissions.index', compact('roles'));
     }
 
     public function edit(Role $role)
     {
-        $permissions = Permission::all();
-        $rolePermissions = $role->permissions->pluck('id')->toArray();
-        return view('admin.role-permissions.edit', compact('role', 'permissions', 'rolePermissions'));
+        $modules = \App\Models\Module::with('subModules.pages')->orderBy('sequence')->get();
+        $rolePages = \Illuminate\Support\Facades\DB::table('role_pages')
+            ->where('role_id', $role->id)
+            ->pluck('page_id')
+            ->toArray();
+            
+        return view('admin.role-permissions.edit', compact('role', 'modules', 'rolePages'));
     }
 
     public function update(Request $request, Role $role)
     {
         $request->validate([
-            'permissions' => 'array',
-            'permissions.*' => 'exists:permissions,id',
+            'pages' => 'array',
+            'pages.*' => 'exists:pages,id',
         ]);
 
-        $permissionIds = collect($request->permissions)->map(fn($id) => (int) $id)->toArray();
-        $role->syncPermissions($permissionIds);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $role) {
+            \Illuminate\Support\Facades\DB::table('role_pages')
+                ->where('role_id', $role->id)
+                ->delete();
+
+            if ($request->has('pages')) {
+                $data = collect($request->pages)->map(function($pageId) use ($role) {
+                    return [
+                        'role_id' => $role->id,
+                        'page_id' => $pageId,
+                    ];
+                })->toArray();
+                
+                \Illuminate\Support\Facades\DB::table('role_pages')->insert($data);
+            }
+        });
 
         return redirect()->route('admin.role-permissions.index')
-            ->with('success', 'Role permissions associated successfully.');
+            ->with('success', 'Role page permissions associated successfully.');
     }
 }

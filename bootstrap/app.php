@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'super_admin' => \App\Http\Middleware\EnsureUserIsSuperAdmin::class,
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'user' => \App\Http\Middleware\EnsureUserIsUser::class,
+            'check_page_permission' => \App\Http\Middleware\CheckPagePermission::class,
         ]);
 
         // Redirect unauthenticated users to appropriate login page

@@ -23,11 +23,11 @@
                                     <span class="fw-bold">{{ ucfirst($role->name) }}</span>
                                 </td>
                                 <td>
-                                    @forelse($role->permissions as $permission)
-                                        <span class="badge bg-info text-dark mb-1">{{ $permission->name }}</span>
-                                    @empty
-                                        <span class="text-muted small italic">No permissions assigned</span>
-                                    @endforelse
+                                    @if($role->pages_count > 0)
+                                        <span class="badge bg-success">{{ $role->pages_count }} Pages Assigned</span>
+                                    @else
+                                        <span class="text-muted small italic">No pages assigned</span>
+                                    @endif
                                 </td>
                                 <td class="text-end">
                                     <a href="{{ route('admin.role-permissions.edit', $role) }}"

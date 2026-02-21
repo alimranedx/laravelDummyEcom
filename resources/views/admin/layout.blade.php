@@ -92,128 +92,90 @@
                     <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">
                         Admin Panel
                     </a>
-                    <ul class="nav flex-column">
-                        @can('view admin')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
-                                    href="{{ route('admin.dashboard') }}">
-                                    <i class="bi bi-speedometer2"></i> Dashboard
-                                </a>
-                            </li>
-                        @endcan
-                    </ul>
+                    @php
+                        $user = auth()->user();
+                        if ($user->isSuperAdmin()) {
+                            $permittedModules = \App\Models\Module::with(['subModules' => function($q) {
+                                $q->orderBy('sequence');
+                            }])->orderBy('sequence')->get();
+                        } else {
+                            $permittedModules = \App\Models\Module::with(['subModules' => function($query) use ($user) {
+                                $query->whereExists(function ($q) use ($user) {
+                                    $q->select(DB::raw(1))
+                                      ->from('pages')
+                                      ->join('role_pages', 'pages.id', '=', 'role_pages.page_id')
+                                      ->join('model_has_roles', 'role_pages.role_id', '=', 'model_has_roles.role_id')
+                                      ->whereColumn('pages.sub_module_id', 'sub_modules.id')
+                                      ->where('model_has_roles.model_id', $user->id)
+                                      ->where('model_has_roles.model_type', get_class($user));
+                                })->orderBy('sequence');
+                            }])->whereHas('subModules', function($query) use ($user) {
+                                $query->whereExists(function ($q) use ($user) {
+                                    $q->select(DB::raw(1))
+                                      ->from('pages')
+                                      ->join('role_pages', 'pages.id', '=', 'role_pages.page_id')
+                                      ->join('model_has_roles', 'role_pages.role_id', '=', 'model_has_roles.role_id')
+                                      ->whereColumn('pages.sub_module_id', 'sub_modules.id')
+                                      ->where('model_has_roles.model_id', $user->id)
+                                      ->where('model_has_roles.model_type', get_class($user));
+                                });
+                            })->orderBy('sequence')->get();
+                        }
+                    @endphp
 
-                    @if(auth()->user()->isSuperAdmin())
-                        <div class="sidebar-heading px-3 mt-4 mb-1 text-uppercase fw-bold opacity-75">
-                            <i class="bi bi-shield-lock me-1"></i> User Management
-                        </div>
-                        <ul class="nav flex-column mb-2">
-                            <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center {{ request()->is('admin/admin-management*') || request()->is('admin/user-management*') ? 'active' : '' }}"
-                                    data-bs-toggle="collapse" href="#userMgmtSubmenu" role="button"
-                                    aria-expanded="{{ request()->is('admin/admin-management*') || request()->is('admin/user-management*') ? 'true' : 'false' }}"
-                                    aria-controls="userMgmtSubmenu">
-                                    <i class="bi bi-people-fill me-2"></i>
-                                    <span>Accounts</span>
-                                    <i class="bi bi-chevron-down ms-auto small transition-icon"></i>
-                                </a>
-                                <div class="collapse {{ request()->is('admin/admin-management*') || request()->is('admin/user-management*') ? 'show' : '' }} ms-3"
-                                    id="userMgmtSubmenu">
-                                    <ul
-                                        class="nav flex-column border-start border-secondary border-opacity-25 ms-2 ps-2 mt-1">
-                                        <li class="nav-item">
-                                            <a class="nav-link py-1 opacity-75 {{ request()->routeIs('admin.admin-management.*') ? 'active text-primary fw-bold' : '' }}"
-                                                href="{{ route('admin.admin-management.index') }}">
-                                                <i class="bi bi-person-badge me-2"></i> Admins
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link py-1 opacity-75 {{ request()->routeIs('admin.user-management.*') ? 'active text-primary fw-bold' : '' }}"
-                                                href="{{ route('admin.user-management.index') }}">
-                                                <i class="bi bi-person me-2"></i> Users
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <!-- Role page association -->
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->is('admin/roles*') || request()->is('admin/permissions*') || request()->is('admin/role-permissions*') || request()->is('admin/admin-user-roles*') ? 'active' : '' }}"
-                                    data-bs-toggle="collapse" href="#roleSubmenu" role="button" aria-expanded="false"
-                                    aria-controls="roleSubmenu">
-                                    <i class="bi bi-shield-check"></i> Role & Association
-                                    <i class="bi bi-chevron-down ms-auto small"></i>
-                                </a>
-                                <div class="collapse {{ request()->is('admin/roles*') || request()->is('admin/permissions*') || request()->is('admin/role-permissions*') || request()->is('admin/admin-user-roles*') ? 'show' : '' }} ms-3"
-                                    id="roleSubmenu">
-                                    <ul class="nav flex-column border-start border-secondary small">
-                                        <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('admin.roles.*') ? 'text-white fw-bold' : '' }}"
-                                                href="{{ route('admin.roles.index') }}">
-                                                <i class="bi bi-tags small me-1"></i> Role Management
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('admin.permissions.*') ? 'text-white fw-bold' : '' }}"
-                                                href="{{ route('admin.permissions.index') }}">
-                                                <i class="bi bi-key small me-1"></i> Permission Management
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('admin.admin-user-roles.*') ? 'text-white fw-bold' : '' }}"
-                                                href="{{ route('admin.admin-user-roles.index') }}">
-                                                <i class="bi bi-person-badge small me-1"></i> Admin User Role
-                                            </a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link {{ request()->routeIs('admin.role-permissions.*') ? 'text-white fw-bold' : '' }}"
-                                                href="{{ route('admin.role-permissions.index') }}">
-                                                <i class="bi bi-link-45deg small me-1"></i> Role Permission Association
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        </ul>
-                    @endif
+                    @foreach($permittedModules as $module)
+                        <li class="nav-item">
+                            @php
+                                $isModuleActive = false;
+                                $subModuleHtml = '';
+                                foreach($module->subModules as $subModule) {
+                                    $isActive = false;
+                                    $routeAction = request()->route()?->getActionName();
+                                    if ($routeAction && str_contains($routeAction, '@')) {
+                                         [$controller, $method] = explode('@', $routeAction);
+                                         if (ltrim($controller, '\\') === $subModule->controller_name) {
+                                             $isActive = true;
+                                             $isModuleActive = true;
+                                         }
+                                    }
 
-                    <div class="sidebar-heading">Management</div>
-                    <ul class="nav flex-column">
-                        @can('manage brands')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.brands.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.brands.index') }}">
-                                    <i class="bi bi-patch-check"></i> Brands
-                                </a>
-                            </li>
-                        @endcan
-                        @can('manage categories')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.categories.index') }}">
-                                    <i class="bi bi-folder"></i> Categories
-                                </a>
-                            </li>
-                        @endcan
+                                    $routeName = 'admin.' . strtolower($subModule->name) . '.index';
+                                    if (!Route::has($routeName)) {
+                                         if ($subModule->name == 'Admins') $routeName = 'admin.admin-management.index';
+                                         elseif ($subModule->name == 'Regular Users') $routeName = 'admin.user-management.index';
+                                         elseif ($subModule->name == 'Role Permission Association' || $subModule->name == 'Role Associations') $routeName = 'admin.role-permissions.index';
+                                         elseif ($subModule->name == 'Admin User Role' || $subModule->name == 'Admin User Roles') $routeName = 'admin.admin-user-roles.index';
+                                         elseif ($subModule->name == 'Dashboard') $routeName = 'admin.dashboard';
+                                         elseif ($subModule->name == 'Role') $routeName = 'admin.roles.index';
+                                         elseif ($subModule->name == 'Permission') $routeName = 'admin.permissions.index';
+                                    }
+                                    
+                                    $subModuleUrl = Route::has($routeName) ? route($routeName) : '#';
+                                    $activeClass = $isActive ? 'text-primary fw-bold' : 'opacity-75';
+                                    
+                                    $subModuleHtml .= '<li class="nav-item">
+                                        <a class="nav-link py-1 ' . $activeClass . '" href="' . $subModuleUrl . '">
+                                            <i class="' . $subModule->icon . ' me-2"></i> ' . $subModule->display_name . '
+                                        </a>
+                                    </li>';
+                                }
+                                $moduleId = Str::slug($module->name) . 'Submenu';
+                            @endphp
 
-                        @can('manage products')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.products.index') }}">
-                                    <i class="bi bi-box"></i> Products
-                                </a>
-                            </li>
-                        @endcan
-
-                        @can('manage orders')
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.orders.index') }}">
-                                    <i class="bi bi-cart"></i> Orders
-                                </a>
-                            </li>
-                        @endcan
-                    </ul>
+                            <a class="nav-link d-flex align-items-center {{ $isModuleActive ? 'active' : '' }}" 
+                               data-bs-toggle="collapse" href="#{{ $moduleId }}" role="button" 
+                               aria-expanded="{{ $isModuleActive ? 'true' : 'false' }}" aria-controls="{{ $moduleId }}">
+                                <i class="{{ $module->icon }} me-2"></i>
+                                <span>{{ $module->display_name }}</span>
+                                <i class="bi bi-chevron-down ms-auto small transition-icon"></i>
+                            </a>
+                            <div class="collapse {{ $isModuleActive ? 'show' : '' }} ms-3" id="{{ $moduleId }}">
+                                <ul class="nav flex-column border-start border-secondary border-opacity-25 ms-2 ps-2 mt-1">
+                                    {!! $subModuleHtml !!}
+                                </ul>
+                            </div>
+                        </li>
+                    @endforeach
 
 
                     <ul class="nav flex-column">
