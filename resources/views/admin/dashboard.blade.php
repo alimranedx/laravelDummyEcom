@@ -1,11 +1,19 @@
 @extends('admin.layout')
 
 @section('content')
-    <div class="row">
-        <div class="col-12">
-            <h1 class="mb-4">Admin Dashboard</h1>
+    <div class="container-fluid py-4 animate-fade-in">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="h3 fw-bold text-dark mb-1">Dashboard</h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-0 small">
+                        <li class="breadcrumb-item active text-primary fw-medium" aria-current="page">Dashboard</li>
+                    </ol>
+                </nav>
+            </div>
+            <span class="text-muted small"><i class="bi bi-clock me-1"></i>{{ now()->format('D, M d Y') }}</span>
         </div>
-    </div>
 
     <div class="row g-3 mb-4">
         <div class="col-md-3">
@@ -91,4 +99,5 @@
             </div>
         </div>
     </div>
+</div>{{-- end container-fluid --}}
 @endsection

@@ -92,6 +92,17 @@ class AdminModuleSeeder extends Seeder
                     ],
                 ]
             ],
+            [
+                'name' => 'Reports', 'icon' => 'bi bi-graph-up', 'sequence' => 6, 'display_name' => 'Report',
+                'sub_modules' => [
+                    [
+                        'name' => 'Sale Report', 'controller' => 'App\Http\Controllers\Admin\SaleReportController', 'icon' => 'bi bi-file-earmark-bar-graph', 'sequence' => 1, 'method' => 'index', 'display_name' => 'Sale Report',
+                        'pages' => [
+                            ['name' => 'View Sale Report', 'method' => 'index', 'type' => 2],
+                        ]
+                    ]
+                ]
+            ],
         ];
 
         foreach ($modules as $m) {

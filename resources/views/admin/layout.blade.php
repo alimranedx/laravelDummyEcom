@@ -8,90 +8,23 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        body {
-            overflow-x: hidden;
-        }
-
-        #sidebar {
-            min-height: 100vh;
-            background-color: #212529;
-        }
-
-        #sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.75);
-            padding: 0.75rem 1rem;
-            border-left: 3px solid transparent;
-        }
-
-        #sidebar .nav-link:hover {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        #sidebar .nav-link.active {
-            color: #fff;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left-color: #0d6efd;
-        }
-
-        #sidebar .sidebar-heading {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.5);
-            padding: 0.75rem 1rem;
-            margin-top: 1rem;
-        }
-
-        .sidebar-brand {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #fff;
-            padding: 1rem;
-            text-decoration: none;
-            display: block;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar-brand:hover {
-            color: #fff;
-        }
-
-        #content {
-            min-height: 100vh;
-        }
-
-        .top-navbar {
-            background-color: #fff;
-            border-bottom: 1px solid #dee2e6;
-            padding: 0.75rem 1.5rem;
-        }
-
-        @media (max-width: 768px) {
-            #sidebar {
-                margin-left: -250px;
-                position: fixed;
-                z-index: 1000;
-                width: 250px;
-                transition: margin 0.3s;
-            }
-
-            #sidebar.show {
-                margin-left: 0;
-            }
-        }
-    </style>
+    @stack('styles')
 </head>
 
 <body>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky">
-                    <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">
-                        Admin Panel
+            <nav id="sidebar" class="col-md-3 col-lg-2 p-0 d-md-block sidebar collapse" style="height: 100vh; position: sticky; top: 0; overflow-y: auto; overflow-x: hidden;">
+                <div class="sidebar-brand-wrapper mb-3 text-center">
+                    <a href="{{ route('admin.dashboard') }}" class="text-white text-decoration-none d-flex align-items-center justify-content-center">
+                        <i class="bi bi-shield-check fs-3 me-2 text-info"></i>
+                        <span class="fs-5 fw-bold tracking-tight">E-ADMIN</span>
                     </a>
+                </div>
+                
+                <div>
+
                     @php
                         $user = auth()->user();
                         if ($user->isSuperAdmin()) {
@@ -196,17 +129,16 @@
             </nav>
 
             <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" id="content">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 bg-light" style="min-height: 100vh;">
                 <!-- Top navbar -->
-                <div class="top-navbar d-flex justify-content-between align-items-center">
-                    <button class="btn btn-link d-md-none" type="button"
-                        onclick="document.getElementById('sidebar').classList.toggle('show')">
-                        <i class="bi bi-list"></i>
+                <header class="navbar navbar-expand-md navbar-light bg-white border-bottom sticky-top p-3 mb-3">
+                    <button class="navbar-toggler d-md-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar">
+                        <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="ms-auto">
-                        <span class="text-muted">Welcome, {{ Auth::user()->name }}</span>
+                        <span class="text-secondary small fw-medium">Welcome, {{ Auth::user()->name }}</span>
                     </div>
-                </div>
+                </header>
 
                 <!-- Flash messages -->
                 <div class="mt-3">

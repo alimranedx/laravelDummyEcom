@@ -80,6 +80,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Sale Report
         Route::get('sale-report', [SaleReportController::class, 'index'])->name('sale-report.index');
+        Route::get('sale-report/export', [SaleReportController::class, 'export'])->name('sale-report.export');
 
         // Logout
         Route::post('logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])

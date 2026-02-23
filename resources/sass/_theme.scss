@@ -1,0 +1,196 @@
+// Custom Premium Theme Styles
+// These extend Bootstrap with a premium e-commerce look
+
+:root {
+    --primary-hover: #4338ca;
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --sidebar-bg: #1e1e2d;
+    --sidebar-accent: #373752;
+    --sidebar-gradient: linear-gradient(180deg, #1e1e2d 0%, #151521 100%);
+}
+
+// Glassmorphism
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+// Premium Cards
+.premium-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 1rem;
+    overflow: hidden;
+
+    &:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        border-color: #4f46e5;
+
+        .card-img-wrapper img {
+            transform: scale(1.1);
+        }
+    }
+}
+
+.card-img-wrapper {
+    position: relative;
+    overflow: hidden;
+    padding-top: 100%; // 1:1 Aspect Ratio
+
+    img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+}
+
+// Hero Section Gradient
+.hero-gradient {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border-radius: 0 0 3rem 3rem;
+}
+
+// Sidebar Customizations - Modern & Attractive
+#sidebar {
+    background: var(--sidebar-gradient);
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1001;
+
+    // Scrollbar — hidden until content overflows, subtle on hover
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: transparent; // invisible when not hovered
+        border-radius: 4px;
+        transition: background 0.3s;
+    }
+
+    &:hover::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2); // appears only on hover when overflowing
+    }
+
+    &:hover::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.4);
+    }
+
+    // Firefox — none hides the scrollbar gutter entirely
+    scrollbar-width: none;
+
+    .sidebar-brand-wrapper {
+        padding: 1.5rem;
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-link {
+        color: #a2a3b7 !important;
+        padding: 0.85rem 1.25rem;
+        margin: 0.25rem 1rem;
+        border-radius: 0.75rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+
+        i {
+            font-size: 1.1rem;
+            margin-right: 0.75rem;
+            transition: transform 0.3s ease;
+        }
+
+        &:hover {
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+
+            i {
+                transform: scale(1.2);
+            }
+        }
+
+        &.active {
+            color: #fff !important;
+            background: #009ef7 !important;
+            box-shadow: 0 4px 15px rgba(0, 158, 247, 0.3);
+
+            i {
+                color: #fff !important;
+            }
+        }
+    }
+
+    .sidebar-heading {
+        color: #494b74;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.1rem;
+        padding: 1.5rem 1.75rem 0.5rem;
+    }
+}
+
+// Navbar Refinement
+.admin-navbar {
+    background: #fff;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+}
+
+// Animations
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+}
+
+// Utilities
+.avatar-circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.transition {
+    transition: all 0.2s ease-in-out;
+
+    &:hover {
+        transform: translateY(-1px);
+    }
+}
+
+// Checkout Custom Radio
+.custom-checkout-radio input:checked+label {
+    border-color: #4f46e5 !important;
+    background-color: rgba(79, 70, 229, 0.05) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}

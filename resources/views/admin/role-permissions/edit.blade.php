@@ -1,22 +1,27 @@
 @extends('admin.layout')
 
 @section('content')
-<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-    <h1 class="h2">
-        <i class="bi bi-shield-lock"></i> Role: <span class="text-primary">{{ ucfirst($role->name) }}</span>
-        <small class="text-muted fs-6 ms-2">Page Permissions</small>
-    </h1>
-    <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="{{ route('admin.role-permission-association.index') }}" class="btn btn-sm btn-outline-secondary">
-            <i class="bi bi-arrow-left"></i> Back to Role List
+<div class="container-fluid py-4 animate-fade-in">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h1 class="h3 fw-bold text-dark mb-1">Role Permissions: {{ ucfirst($role->name) }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 small">
+                    <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}" class="text-decoration-none text-muted">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.role-permission-association.index') }}" class="text-decoration-none text-muted">Role Permissions</a></li>
+                    <li class="breadcrumb-item active text-primary fw-medium" aria-current="page">{{ ucfirst($role->name) }}</li>
+                </ol>
+            </nav>
+        </div>
+        <a href="{{ route('admin.role-permission-association.index') }}" class="btn btn-outline-secondary d-inline-flex align-items-center px-4 py-2 rounded-pill">
+            <i class="bi bi-arrow-left me-2"></i><span class="fw-semibold">Back to Roles</span>
         </a>
     </div>
-</div>
 
-<div class="alert alert-info border-0 shadow-sm mb-4">
-    <i class="bi bi-info-circle-fill me-2"></i>
-    <strong>Role-Based Access:</strong> Assigning permissions here will affect all users belonging to the <strong>{{ $role->name }}</strong> role.
-</div>
+    <div class="alert alert-info border-0 rounded-3 shadow-sm mb-4">
+        <i class="bi bi-info-circle-fill me-2"></i>
+        <strong>Role-Based Access:</strong> Assigning permissions here will affect all users belonging to the <strong>{{ $role->name }}</strong> role.
+    </div>
 
 <form action="{{ route('admin.role-permission-association.update', $role) }}" method="POST">
     @csrf
@@ -145,21 +150,5 @@
 </script>
 @endpush
 
-<style>
-    .accordion-button:not(.collapsed) {
-        background-color: #f8f9fa;
-        color: #0d6efd;
-        box-shadow: none;
-    }
-    .accordion-button:focus {
-        box-shadow: none;
-        border-color: rgba(0,0,0,.125);
-    }
-    .accordion-item {
-        border-bottom: 1px solid rgba(0,0,0,.125) !important;
-    }
-    .card-header {
-        background-color: rgba(0,0,0,.03);
-    }
-</style>
+</div>{{-- end container-fluid --}}
 @endsection

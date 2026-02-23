@@ -120,15 +120,4 @@
         </div>
     </div>
 
-    <style>
-        .cursor-pointer {
-            cursor: pointer;
-        }
-
-        .custom-checkout-radio input:checked+label {
-            border-color: var(--primary) !important;
-            background-color: var(--card-hover) !important;
-            box-shadow: var(--shadow-md) !important;
-        }
-    </style>
 @endsection
