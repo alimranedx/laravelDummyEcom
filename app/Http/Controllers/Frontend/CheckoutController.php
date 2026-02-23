@@ -48,7 +48,7 @@ class CheckoutController extends Controller
                     'order_id' => $order->id,
                     'product_id' => $id,
                     'quantity' => $details['quantity'],
-                    'price' => $details['price'],
+                    'unit_price' => $details['price'],
                 ]);
             }
 

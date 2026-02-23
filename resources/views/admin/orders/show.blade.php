@@ -1,3 +1,7 @@
+@php
+    use App\Enums\OrderStatus;
+@endphp
+
 @extends('admin.layout')
 
 @section('content')
@@ -65,8 +69,8 @@
                 <div class="card-body">
                     <p><strong>Status:</strong>
                         <span
-                            class="badge bg-{{ $order->status === 'completed' ? 'success' : ($order->status === 'pending' ? 'warning' : 'secondary') }}">
-                            {{ ucfirst($order->status) }}
+                            class="badge bg-{{ $order->status->value === 'completed' ? 'success' : ($order->status->value === 'pending' ? 'warning' : 'secondary') }}">
+                            {{ $order->status->label() }}
                         </span>
                     </p>
                     <p><strong>Payment Status:</strong> {{ ucfirst($order->payment_status) }}</p>
@@ -86,15 +90,11 @@
 
                         <div class="mb-3">
                             <select class="form-select" name="status" required>
-                                <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option value="processing" {{ $order->status === 'processing' ? 'selected' : '' }}>Processing
-                                </option>
-                                <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed
-                                </option>
-                                <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled
-                                </option>
-                                <option value="refunded" {{ $order->status === 'refunded' ? 'selected' : '' }}>Refunded
-                                </option>
+                                @foreach(OrderStatus::cases() as $status)
+                                    <option value="{{ $status->value }}" {{ $order->status === $status ? 'selected' : '' }}>
+                                        {{ $status->label() }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 

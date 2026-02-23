@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-class EnsureUserIsAdmin
+class RedirectAdminFromFrontend
 {
     /**
      * Handle an incoming request.
@@ -16,17 +16,12 @@ class EnsureUserIsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user()) {
-            return redirect()->route('admin.login');
-        }
+        if (Auth::check() && !$request->user()->isUser()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
 
-        if (!$request->user()->isAdmin()) {
-            if ($request->user()->isUser()) {
-                Auth::guard('web')->logout();
-                $request->session()->invalidate();
-                $request->session()->regenerateToken();
-            }
-            return redirect()->route('admin.login');
+            return redirect($request->fullUrl());
         }
 
         return $next($request);

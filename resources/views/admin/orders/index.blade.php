@@ -30,8 +30,8 @@
                                 <td>${{ number_format($order->total_price, 2) }}</td>
                                 <td>
                                     <span
-                                        class="badge bg-{{ $order->status === 'completed' ? 'success' : ($order->status === 'pending' ? 'warning' : 'secondary') }}">
-                                        {{ ucfirst($order->status) }}
+                                        class="badge bg-{{ $order->status->value === 'completed' ? 'success' : ($order->status->value === 'pending' ? 'warning' : 'secondary') }}">
+                                        {{ $order->status->label() }}
                                     </span>
                                 </td>
                                 <td>{{ ucfirst($order->payment_status) }}</td>

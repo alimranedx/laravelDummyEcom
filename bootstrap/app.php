@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'super_admin' => \App\Http\Middleware\EnsureUserIsSuperAdmin::class,
             'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
             'user' => \App\Http\Middleware\EnsureUserIsUser::class,
+            'frontend' => \App\Http\Middleware\RedirectAdminFromFrontend::class,
             'check_page_permission' => \App\Http\Middleware\CheckPagePermission::class,
         ]);
 
@@ -33,6 +34,8 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return route('login');
         });
+        
+        $middleware->redirectUsersTo(fn() => route('dashboard'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

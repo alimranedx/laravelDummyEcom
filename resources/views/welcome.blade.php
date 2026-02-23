@@ -1,21 +1,61 @@
 @extends('layouts.frontend')
 
 @section('content')
-    <!-- Hero Section -->
-    <section class="hero-gradient text-center animate-fade-in shadow-lg">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <h1 class="display-3 fw-extrabold mb-4">Discover Your Future Style</h1>
-                    <p class="lead mb-5 opacity-75 fs-4">Explore our curated collection of premium products designed for the
-                        modern individual.</p>
-                    <a href="#products" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm">
-                        Shop Now <i class="bi bi-arrow-right-short"></i>
-                    </a>
+    <!-- Hero Slider Section -->
+    @if($sliderProducts->count() > 0)
+        <section id="heroSlider" class="carousel slide hero-slider shadow-lg animate-fade-in" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                @foreach($sliderProducts as $index => $sp)
+                    <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}" aria-current="true"></button>
+                @endforeach
+            </div>
+            <div class="carousel-inner">
+                @foreach($sliderProducts as $index => $sp)
+                    <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
+                        <img src="{{ asset('storage/' . $sp->image_path) }}" class="d-block w-100" alt="{{ $sp->name }}">
+                        <div class="slider-overlay"></div>
+                        <div class="carousel-caption d-none d-md-block animate-fade-in">
+                            <h1 class="display-3 fw-extrabold">{{ $sp->name }}</h1>
+                            <p class="lead">{{ Str::limit(strip_tags($sp->description), 120) }}</p>
+                            <div class="d-flex gap-3">
+                                <a href="{{ route('product.show', $sp->slug) }}" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm">
+                                    Shop Now <i class="bi bi-arrow-right-short"></i>
+                                </a>
+                                <span class="btn btn-premium btn-lg px-4 py-3 rounded-pill fw-bold border-0" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+                                    ${{ number_format($sp->price, 2) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            @if($sliderProducts->count() > 1)
+                <button class="carousel-control-prev" type="button" data-bs-target="#heroSlider" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#heroSlider" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            @endif
+        </section>
+    @else
+        <!-- Fallback Hero Section -->
+        <section class="hero-gradient text-center animate-fade-in shadow-lg">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <h1 class="display-3 fw-extrabold mb-4">Discover Your Future Style</h1>
+                        <p class="lead mb-5 opacity-75 fs-4">Explore our curated collection of premium products designed for the modern individual.</p>
+                        <a href="#products" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm">
+                            Shop Now <i class="bi bi-arrow-right-short"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
 
     <div class="container" id="products">
         <div class="row">

@@ -40,9 +40,10 @@ class HomeController extends Controller
         }
 
         $products = $query->paginate(12);
+        $sliderProducts = Product::whereNotNull('image_path')->latest()->take(5)->get();
         $categories = Category::all();
 
-        return view('welcome', compact('products', 'categories'));
+        return view('welcome', compact('products', 'categories', 'sliderProducts'));
     }
 
     public function productDetail($slug)
