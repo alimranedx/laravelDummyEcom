@@ -75,34 +75,42 @@ This project uses a custom, database-driven hierarchical permission system. Foll
 
 ### 1. The Permission Hierarchy
 Permissions are structured as:
-`Module` > `SubModule` > `Page` (represents a Controller method)
+`Module` > `Sub-module` (associated with a Controller) > `Page` (associated with a Controller Method)
+
+- **Modules**: High-level groupings (e.g., "Inventory", "RBAC").
+- **Sub-modules**: Specific features (e.g., "Brands", "Role Permission Association").
+- **Pages**: Individual actions/methods (e.g., `index`, `create`, `store`).
 
 ### 2. Adding a New Feature Step-by-Step
 
 #### Step A: Create the Controller and Routes
 1. Create your controller: `php artisan make:controller Admin/YourFeatureController -r`
 2. Define your routes in `routes/admin.php` within the `check_page_permission` middleware group.
+3. **CRITICAL: Route Naming Convention**
+   The sidebar generates links automatically based on the sub-module name. To ensure compatibility:
+   - Use kebab-case of the sub-module name as the route prefix.
+   - Example: Sub-module "Sale Report" -> Route name should start with `admin.sale-report.`
+   - Example Route: `Route::get('sale-report', [SaleReportController::class, 'index'])->name('admin.sale-report.index');`
 
 #### Step B: Register in `AdminModuleSeeder`
 You must register your new feature in `database/seeders/AdminModuleSeeder.php` so the system knows it exists.
 1. Add your module/sub-module definition to the `$modules` array.
-2. Specify the `controller_name` (fully qualified with namespace) for the sub-module.
-3. Define the `pages` (methods like `index`, `create`, `store`).
+2. Specify the `controller_name` (e.g., `App\Http\Controllers\Admin\SaleReportController`).
+3. Define the `pages` array (e.g., `['index' => 2, 'create' => 2, 'store' => 1]`).
+   - `method_type` constants: `1=Post`, `2=Get`, `3=Put`, `4=Delete`.
 4. Re-run seed: `php artisan db:seed --class=AdminModuleSeeder`
 
 #### Step C: Sidebar Integration
-The sidebar in `resources/views/admin/layout.blade.php` automatically renders modules and sub-modules that the logged-in user has permission to see.
-- If your route name follows the standard `admin.feature-name.index` pattern, it will work automatically.
-- If you use a custom route name, update the mapping logic in the `layout.blade.php` sidebar loop.
+The sidebar in `resources/views/admin/layout.blade.php` automatically renders modules and sub-modules.
+- The system searches for a route named: `admin.{kebab-case-sub-module-name}.{default_method}`.
+- If your route doesn't follow this, you can add a manual override in the `@if (!Route::has($routeName))` block in `layout.blade.php`.
 
 ### 3. Permission Enforcement
-All admin routes are protected by the `CheckPagePermission` middleware. It extracts the controller and method from the current request and checks if the user's role is associated with that specific `Page` in the `role_pages` table.
-
-> **IMPORTANT**: Standard Laravel/Spatie `can` middleware (e.g., `->middleware('can:manage brands')`) is **NOT** used for admin routes. All authorization must be configured via the **RBAC** module in the admin panel. Adding legacy `can` middleware to routes will cause `403 Unauthorized` errors.
-
-- **Super Admin**: Bypasses all checks and sees everything.
-- **Admin**: Permissions are managed via the **RBAC > Role Permission Association** interface.
-- **RBAC Module**: This specific module is hard-coded to be restricted to **Super Admins only**.
+All admin routes are protected by the `CheckPagePermission` middleware.
+1. It looks up the `pages` table using the current `Controller@method`.
+2. It checks the `role_pages` table to see if any of the user's roles are associated with that page ID.
+3. **Super Admin**: Always has access (bypasses check).
+4. **RBAC Module**: Hard-coded to be restricted to **Super Admins only** for security.
 
 ---
 

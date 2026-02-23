@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Assign Roles to Admin: {{ $user->name }}</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <a href="{{ route('admin.admin-user-roles.index') }}" class="btn btn-sm btn-outline-secondary">
+            <a href="{{ route('admin.admin-user-role.index') }}" class="btn btn-sm btn-outline-secondary">
                 <i class="bi bi-arrow-left"></i> Back to List
             </a>
         </div>
@@ -12,7 +12,7 @@
 
     <div class="card shadow-sm col-md-8">
         <div class="card-body">
-            <form action="{{ route('admin.admin-user-roles.update', $user) }}" method="POST">
+            <form action="{{ route('admin.admin-user-role.update', $user) }}" method="POST">
                 @csrf
                 @method('PATCH')
 

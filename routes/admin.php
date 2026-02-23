@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\RolePermissionAssociationController;
 use App\Http\Controllers\Admin\AdminUserRoleController;
 use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\UserManagementController;
+use App\Http\Controllers\Admin\SaleReportController;
 
 Route::prefix('admin')->name('admin.')->group(function () {
 
@@ -67,15 +68,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('user-management', UserManagementController::class)->parameters(['user-management' => 'user']);
 
             // Role Permission Association
-            Route::get('role-permissions', [RolePermissionAssociationController::class, 'index'])->name('role-permissions.index');
-            Route::get('role-permissions/{role}/edit', [RolePermissionAssociationController::class, 'edit'])->name('role-permissions.edit');
-            Route::put('role-permissions/{role}', [RolePermissionAssociationController::class, 'update'])->name('role-permissions.update');
+            Route::get('role-permission-association', [RolePermissionAssociationController::class, 'index'])->name('role-permission-association.index');
+            Route::get('role-permission-association/{role}/edit', [RolePermissionAssociationController::class, 'edit'])->name('role-permission-association.edit');
+            Route::put('role-permission-association/{role}', [RolePermissionAssociationController::class, 'update'])->name('role-permission-association.update');
 
             // Admin User Role assignment
-            Route::get('admin-user-roles', [AdminUserRoleController::class, 'index'])->name('admin-user-roles.index');
-            Route::get('admin-user-roles/{user}/edit', [AdminUserRoleController::class, 'edit'])->name('admin-user-roles.edit');
-            Route::patch('admin-user-roles/{user}', [AdminUserRoleController::class, 'update'])->name('admin-user-roles.update');
+            Route::get('admin-user-role', [AdminUserRoleController::class, 'index'])->name('admin-user-role.index');
+            Route::get('admin-user-role/{user}/edit', [AdminUserRoleController::class, 'edit'])->name('admin-user-role.edit');
+            Route::patch('admin-user-role/{user}', [AdminUserRoleController::class, 'update'])->name('admin-user-role.update');
         });
+
+        // Sale Report
+        Route::get('sale-report', [SaleReportController::class, 'index'])->name('sale-report.index');
 
         // Logout
         Route::post('logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])

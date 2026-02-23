@@ -30,7 +30,7 @@
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    <a href="{{ route('admin.role-permissions.edit', $role) }}"
+                                    <a href="{{ route('admin.role-permission-association.edit', $role) }}"
                                         class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-link-45deg"></i> Manage Associations
                                     </a>

@@ -30,7 +30,7 @@
                                     @endforelse
                                 </td>
                                 <td class="text-end">
-                                    <a href="{{ route('admin.admin-user-roles.edit', $user) }}"
+                                    <a href="{{ route('admin.admin-user-role.edit', $user) }}"
                                         class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-person-gear"></i> Manage Roles
                                     </a>

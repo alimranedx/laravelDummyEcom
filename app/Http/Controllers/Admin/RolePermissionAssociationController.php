@@ -75,7 +75,7 @@ class RolePermissionAssociationController extends Controller
             }
         });
 
-        return redirect()->route('admin.role-permissions.index')
+        return redirect()->route('admin.role-permission-association.index')
             ->with('success', 'Role page permissions associated successfully.');
     }
 }

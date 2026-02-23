@@ -7,7 +7,7 @@
         <small class="text-muted fs-6 ms-2">Page Permissions</small>
     </h1>
     <div class="btn-toolbar mb-2 mb-md-0">
-        <a href="{{ route('admin.role-permissions.index') }}" class="btn btn-sm btn-outline-secondary">
+        <a href="{{ route('admin.role-permission-association.index') }}" class="btn btn-sm btn-outline-secondary">
             <i class="bi bi-arrow-left"></i> Back to Role List
         </a>
     </div>
@@ -18,7 +18,7 @@
     <strong>Role-Based Access:</strong> Assigning permissions here will affect all users belonging to the <strong>{{ $role->name }}</strong> role.
 </div>
 
-<form action="{{ route('admin.role-permissions.update', $role) }}" method="POST">
+<form action="{{ route('admin.role-permission-association.update', $role) }}" method="POST">
     @csrf
     @method('PUT')
 

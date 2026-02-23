@@ -162,16 +162,12 @@
                                                 $subController = ltrim(explode('@', $currentAction)[0] ?? '', '\\');
                                                 $isSubActive = ($subController === $subModule->controller_name);
                                             }
-
-                                            $routeName = 'admin.' . strtolower($subModule->name) . '.index';
+                                            $routeName = 'admin.' . strtolower(str_replace(' ', '-', $subModule->name)) . '.'.strtolower(trim($subModule->default_method  ?? ''));
                                             if (!Route::has($routeName)) {
                                                  if ($subModule->name == 'Admins') $routeName = 'admin.admin-management.index';
                                                  elseif ($subModule->name == 'Regular Users') $routeName = 'admin.user-management.index';
-                                                 elseif ($subModule->name == 'Role Permission Association' || $subModule->name == 'Role Associations') $routeName = 'admin.role-permissions.index';
-                                                 elseif ($subModule->name == 'Admin User Role' || $subModule->name == 'Admin User Roles') $routeName = 'admin.admin-user-roles.index';
                                                  elseif ($subModule->name == 'Dashboard') $routeName = 'admin.dashboard';
                                                  elseif ($subModule->name == 'Role') $routeName = 'admin.roles.index';
-                                                 elseif ($subModule->name == 'Permission') $routeName = 'admin.permissions.index';
                                             }
                                             $subModuleUrl = Route::has($routeName) ? route($routeName) : '#';
                                         @endphp

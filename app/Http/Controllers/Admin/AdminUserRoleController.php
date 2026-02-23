@@ -13,7 +13,7 @@ class AdminUserRoleController extends Controller
     {
         // Only list Admin type users (user_type = 1)
         $users = User::where('user_type', \App\Enums\UserType::ADMIN)->with('roles')->get();
-        return view('admin.admin-user-roles.index', compact('users'));
+        return view('admin.admin-user-role.index', compact('users'));
     }
 
     public function edit(User $user)
@@ -25,7 +25,7 @@ class AdminUserRoleController extends Controller
         $roles = Role::where('name', '!=', 'user')->get();
         $userRoles = $user->roles->pluck('name')->toArray();
 
-        return view('admin.admin-user-roles.edit', compact('user', 'roles', 'userRoles'));
+        return view('admin.admin-user-role.edit', compact('user', 'roles', 'userRoles'));
     }
 
     public function update(Request $request, User $user)
@@ -41,7 +41,7 @@ class AdminUserRoleController extends Controller
 
         $user->syncRoles($request->roles);
 
-        return redirect()->route('admin.admin-user-roles.index')
+        return redirect()->route('admin.admin-user-role.index')
             ->with('success', 'Admin user roles updated successfully.');
     }
 }
