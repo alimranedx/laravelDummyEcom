@@ -102,7 +102,7 @@ You must register your new feature in `database/seeders/AdminModuleSeeder.php` s
 
 #### Step C: Sidebar Integration
 The sidebar in `resources/views/admin/layout.blade.php` automatically renders modules and sub-modules.
-- The system searches for a route named: `admin.{kebab-case-sub-module-name}.{default_method}`.
+- The system searches for a route named: `admin.str_replace(' ','-',{kebab-case-sub-module-name}).{default_method}`.
 - If your route doesn't follow this, you can add a manual override in the `@if (!Route::has($routeName))` block in `layout.blade.php`.
 
 ### 3. Permission Enforcement
