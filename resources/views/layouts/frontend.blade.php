@@ -15,6 +15,7 @@
     <!-- Styles -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    @stack('style-css')
 </head>
 
 <body>
@@ -76,7 +77,7 @@
     </nav>
 
     <main>
-        @if(session('success'))
+        @if (session('success'))
             <div class="container mt-4">
                 <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm rounded-pill px-4"
                     role="alert">
@@ -85,7 +86,7 @@
                 </div>
             </div>
         @endif
-        @if(session('error'))
+        @if (session('error'))
             <div class="container mt-4">
                 <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm rounded-pill px-4"
                     role="alert">
@@ -108,7 +109,8 @@
                     <p class="text-muted mb-0">Experience the next generation of online shopping.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end mt-4 mt-md-0">
-                    <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}. All rights reserved.</p>
+                    <p class="mb-0">&copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}. All rights
+                        reserved.</p>
                 </div>
             </div>
         </div>

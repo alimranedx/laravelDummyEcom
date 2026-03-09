@@ -7,16 +7,18 @@ use App\Models\Order;
 use App\Enums\OrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
+use App\Common\Services\SaleReportService;
 
 class SaleReportController extends Controller
 {
     public function index(Request $request)
     {
+        $data = (new SaleReportService)->getByFilters($request->all());
+    
         $query = Order::with('user')->latest();
 
-        // Simple filtering
         if ($request->filled('date_range')) {
-            $dates = explode(' to ', $request->date_range);
+            $dates = explode(' - ', $request->date_range);
             if (count($dates) === 2) {
                 $query->whereDate('created_at', '>=', $dates[0])
                       ->whereDate('created_at', '<=', $dates[1]);
@@ -26,18 +28,23 @@ class SaleReportController extends Controller
         }
 
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            if (is_array($status)) {
+                $query->whereIn('status', $status);
+            } else {
+                $query->where('status', $status);
+            }
         }
 
-        $summary = [
+        $data['summary'] = [
             'total_revenue' => (clone $query)->sum('total_price'),
             'total_orders' => (clone $query)->count(),
         ];
 
-        $sales = $query->paginate(20)->withQueryString();
-        $statuses = OrderStatus::cases();
+        $data['sales'] = $query->paginate(20)->withQueryString();
+        $data['statuses'] = OrderStatus::cases();
 
-        return view('admin.sale-report.index', compact('sales', 'statuses', 'summary'));
+        return view('admin.sale-report.index', $data);
     }
 
     /**

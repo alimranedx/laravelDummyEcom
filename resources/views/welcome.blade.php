@@ -1,27 +1,52 @@
 @extends('layouts.frontend')
+@push('style-css')
+    <style>
+        .hero-slider {
+            height: 400px;
+            /* change as you want */
+        }
+
+        .hero-slider .carousel-item {
+            height: 400px;
+        }
+
+        .hero-slider .carousel-item img {
+            height: 400px;
+            object-fit: cover;
+        }
+
+        .hero-slider .carousel-caption {
+            top: 25% !important;
+        }
+    </style>
+@endpush
 
 @section('content')
     <!-- Hero Slider Section -->
-    @if($sliderProducts->count() > 0)
+    @if ($sliderProducts->count() > 0)
         <section id="heroSlider" class="carousel slide hero-slider shadow-lg animate-fade-in" data-bs-ride="carousel">
             <div class="carousel-indicators">
-                @foreach($sliderProducts as $index => $sp)
-                    <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}" aria-current="true"></button>
+                @foreach ($sliderProducts as $index => $sp)
+                    <button type="button" data-bs-target="#heroSlider" data-bs-slide-to="{{ $index }}"
+                        class="{{ $index == 0 ? 'active' : '' }}" aria-current="true"></button>
                 @endforeach
             </div>
             <div class="carousel-inner">
-                @foreach($sliderProducts as $index => $sp)
+                @foreach ($sliderProducts as $index => $sp)
                     <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
-                        <img src="{{ asset('storage/' . $sp->image_path) }}" class="d-block w-100" alt="{{ $sp->name }}">
+                        <img src="{{ asset('storage/' . $sp->image_path) }}" class="d-block w-100"
+                            alt="{{ $sp->name }}">
                         <div class="slider-overlay"></div>
                         <div class="carousel-caption d-none d-md-block animate-fade-in">
                             <h1 class="display-3 fw-extrabold">{{ $sp->name }}</h1>
                             <p class="lead">{{ Str::limit(strip_tags($sp->description), 120) }}</p>
                             <div class="d-flex gap-3">
-                                <a href="{{ route('product.show', $sp->slug) }}" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm">
+                                <a href="{{ route('product.show', $sp->slug) }}"
+                                    class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm">
                                     Shop Now <i class="bi bi-arrow-right-short"></i>
                                 </a>
-                                <span class="btn btn-premium btn-lg px-4 py-3 rounded-pill fw-bold border-0" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+                                <span class="btn btn-premium btn-lg px-4 py-3 rounded-pill fw-bold border-0"
+                                    style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
                                     ${{ number_format($sp->price, 2) }}
                                 </span>
                             </div>
@@ -29,7 +54,7 @@
                     </div>
                 @endforeach
             </div>
-            @if($sliderProducts->count() > 1)
+            @if ($sliderProducts->count() > 1)
                 <button class="carousel-control-prev" type="button" data-bs-target="#heroSlider" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="visually-hidden">Previous</span>
@@ -47,7 +72,8 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-8">
                         <h1 class="display-3 fw-extrabold mb-4">Discover Your Future Style</h1>
-                        <p class="lead mb-5 opacity-75 fs-4">Explore our curated collection of premium products designed for the modern individual.</p>
+                        <p class="lead mb-5 opacity-75 fs-4">Explore our curated collection of premium products designed for
+                            the modern individual.</p>
                         <a href="#products" class="btn btn-light btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm">
                             Shop Now <i class="bi bi-arrow-right-short"></i>
                         </a>
@@ -68,7 +94,7 @@
                             class="list-group-item list-group-item-action {{ !request('category') ? 'active text-white' : '' }}">
                             <i class="bi bi-grid-fill me-2"></i>All Products
                         </a>
-                        @foreach($categories as $category)
+                        @foreach ($categories as $category)
                             <a href="{{ route('home', ['category' => $category->slug]) }}"
                                 class="list-group-item list-group-item-action {{ request('category') == $category->slug ? 'active text-white' : '' }}">
                                 <i class="bi bi-chevron-right me-2 small"></i>{{ $category->name }}
@@ -80,7 +106,7 @@
                 <div class="sidebar-section shadow-sm animate-fade-in" style="animation-delay: 0.1s;">
                     <h5 class="fw-bold mb-4">Refine by Price</h5>
                     <form action="{{ route('home') }}" method="GET">
-                        @if(request('category'))
+                        @if (request('category'))
                             <input type="hidden" name="category" value="{{ request('category') }}">
                         @endif
                         <div class="mb-4">
@@ -99,7 +125,8 @@
                             </div>
                         </div>
                         <button type="submit" class="btn btn-premium w-100 rounded-pill mb-3">Apply Filter</button>
-                        <a href="{{ route('home') }}" class="btn btn-link w-100 text-muted text-decoration-none small">Clear
+                        <a href="{{ route('home') }}"
+                            class="btn btn-link w-100 text-muted text-decoration-none small">Clear
                             All</a>
                     </form>
                 </div>
@@ -136,16 +163,19 @@
                             <div class="premium-card h-100 shadow-sm border-0">
                                 <div class="card-img-wrapper">
                                     <a href="{{ route('product.show', $product->slug) }}">
-                                        @if($product->image_path)
-                                            <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}">
+                                        @if ($product->image_path)
+                                            <img src="{{ asset('storage/' . $product->image_path) }}"
+                                                alt="{{ $product->name }}">
                                         @else
-                                            <div class="bg-light d-flex align-items-center justify-content-center h-100 w-100">
+                                            <div
+                                                class="bg-light d-flex align-items-center justify-content-center h-100 w-100">
                                                 <i class="bi bi-image text-muted fs-1"></i>
                                             </div>
                                         @endif
                                     </a>
-                                    @if($product->stock <= 0)
-                                        <span class="position-absolute top-0 end-0 m-3 badge bg-danger rounded-pill shadow-sm">Sold
+                                    @if ($product->stock <= 0)
+                                        <span
+                                            class="position-absolute top-0 end-0 m-3 badge bg-danger rounded-pill shadow-sm">Sold
                                             Out</span>
                                     @endif
                                 </div>
@@ -161,7 +191,7 @@
                                     <div class="mt-auto d-flex justify-content-between align-items-center">
                                         <span
                                             class="fs-4 fw-extrabold text-primary">${{ number_format($product->price, 2) }}</span>
-                                        @if($product->stock > 0)
+                                        @if ($product->stock > 0)
                                             <a href="{{ route('cart.add', $product->id) }}"
                                                 class="btn btn-premium rounded-circle p-2 shadow-sm d-flex align-items-center justify-content-center"
                                                 style="width: 40px; height: 40px;">
