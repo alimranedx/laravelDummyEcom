@@ -129,6 +129,7 @@
     </div>
     @push('styles')
         <link rel="stylesheet" href="{{ asset('/assets/bootstrap-select-1.14.0-beta3/css/bootstrap-select.min.css') }}">
+        <style>
         .transition-row {
         transition: background-color 0.2s;
         }
