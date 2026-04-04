@@ -1,0 +1,136 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class SubModuleSeeder extends Seeder
+{
+    public function run(): void
+    {
+        DB::table('sub_modules')->insert([
+            [
+                'id' => 1,
+                'module_id' => 1,
+                'name' => 'Brands',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\BrandController',
+                'icon' => 'bi bi-patch-check',
+                'sequence' => 1,
+                'default_method' => 'index',
+                'display_name' => 'Brands',
+                'created_at' => Carbon::parse('2026-02-23 09:52:53'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:53'),
+            ],
+            [
+                'id' => 2,
+                'module_id' => 1,
+                'name' => 'Categories',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\CategoryController',
+                'icon' => 'bi bi-folder',
+                'sequence' => 2,
+                'default_method' => 'index',
+                'display_name' => 'Categories',
+                'created_at' => Carbon::parse('2026-02-23 09:52:53'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:53'),
+            ],
+            [
+                'id' => 3,
+                'module_id' => 1,
+                'name' => 'Products',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\ProductController',
+                'icon' => 'bi bi-box',
+                'sequence' => 3,
+                'default_method' => 'index',
+                'display_name' => 'Products',
+                'created_at' => Carbon::parse('2026-02-23 09:52:53'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:53'),
+            ],
+            [
+                'id' => 4,
+                'module_id' => 2,
+                'name' => 'Orders',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\OrderController',
+                'icon' => 'bi bi-receipt',
+                'sequence' => 1,
+                'default_method' => 'index',
+                'display_name' => 'Orders',
+                'created_at' => Carbon::parse('2026-02-23 09:52:53'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:53'),
+            ],
+            [
+                'id' => 5,
+                'module_id' => 3,
+                'name' => 'Admins',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\AdminManagementController',
+                'icon' => 'bi bi-person-badge',
+                'sequence' => 1,
+                'default_method' => 'index',
+                'display_name' => 'Admins',
+                'created_at' => Carbon::parse('2026-02-23 09:52:53'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:53'),
+            ],
+            [
+                'id' => 6,
+                'module_id' => 3,
+                'name' => 'Regular Users',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\UserManagementController',
+                'icon' => 'bi bi-person',
+                'sequence' => 2,
+                'default_method' => 'index',
+                'display_name' => 'Users',
+                'created_at' => Carbon::parse('2026-02-23 09:52:53'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:53'),
+            ],
+            [
+                'id' => 7,
+                'module_id' => 4,
+                'name' => 'Role',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\RoleController',
+                'icon' => 'bi bi-tags',
+                'sequence' => 1,
+                'default_method' => 'index',
+                'display_name' => 'Role',
+                'created_at' => Carbon::parse('2026-02-23 09:52:53'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:53'),
+            ],
+            [
+                'id' => 8,
+                'module_id' => 4,
+                'name' => 'Role Permission Association',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\RolePermissionAssociationController',
+                'icon' => 'bi bi-link-45deg',
+                'sequence' => 3,
+                'default_method' => 'index',
+                'display_name' => 'Role Permission Association',
+                'created_at' => Carbon::parse('2026-02-23 09:52:53'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:53'),
+            ],
+            [
+                'id' => 9,
+                'module_id' => 4,
+                'name' => 'Admin User Role',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\AdminUserRoleController',
+                'icon' => 'bi bi-person-badge',
+                'sequence' => 4,
+                'default_method' => 'index',
+                'display_name' => 'Admin User Role',
+                'created_at' => Carbon::parse('2026-02-23 09:52:54'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:54'),
+            ],
+            [
+                'id' => 10,
+                'module_id' => 5,
+                'name' => 'Sale Report',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\SaleReportController',
+                'icon' => 'bi bi-file-earmark-bar-graph',
+                'sequence' => 1,
+                'default_method' => 'index',
+                'display_name' => 'Sale Report',
+                'created_at' => Carbon::parse('2026-02-23 09:52:54'),
+                'updated_at' => Carbon::parse('2026-02-23 09:52:54'),
+            ],
+        ]);
+    }
+}
