@@ -2,25 +2,40 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Common\Services\ProductService;
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with(['category', 'brand'])->latest()->paginate(15);
-        return view('admin.products.index', compact('products'));
+        $data = [
+            'page_title' => 'Product Catalog',
+            'base_page' => 'Dashboard',
+            'breadcrum_navigator' => 'Products',
+        ];
+        $productServiceObj = new ProductService;
+        $data['filterData'] = $productServiceObj->prepareFilters($request->all());
+        $data['products'] = $productServiceObj->getByFilters($data['filterData']);
+
+        $data['categories'] = Category::all();
+        $data['brands'] = Brand::all();
+        $data['route'] = route('admin.products.index');
+        $data['per_page'] = $request->input('per_page', 10);
+
+        return view('admin.products.index', $data);
     }
 
     public function create()
     {
         $categories = Category::all();
         $brands = Brand::all();
+
         return view('admin.products.create', compact('categories', 'brands'));
     }
 
@@ -51,6 +66,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $product->load(['category', 'brand']);
+
         return view('admin.products.show', compact('product'));
     }
 
@@ -58,6 +74,7 @@ class ProductController extends Controller
     {
         $categories = Category::all();
         $brands = Brand::all();
+
         return view('admin.products.edit', compact('product', 'categories', 'brands'));
     }
 

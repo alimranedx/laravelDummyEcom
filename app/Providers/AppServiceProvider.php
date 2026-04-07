@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Pagination\Paginator::useBootstrapFive();
+
         \Illuminate\Auth\Middleware\RedirectIfAuthenticated::redirectUsing(function ($request) {
             if ($request->user()->isAdmin()) {
                 return route('admin.dashboard');
