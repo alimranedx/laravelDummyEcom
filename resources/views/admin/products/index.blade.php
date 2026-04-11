@@ -64,11 +64,6 @@
                             <label class="form-label small fw-bold text-muted text-uppercase mb-1">Category</label>
                             <select name="category_id[]" id="category_filter" class="selectpicker form-control" multiple
                                 data-actions-box="true" data-live-search="true" title="All Categories">
-                                @foreach ($categories as $cat)
-                                    <option value="{{ $cat->id }}" data-brand-id="{{ $cat->brand_id }}"
-                                        {{ in_array($cat->id, (array) request('category_id')) ? 'selected' : '' }}>
-                                        {{ $cat->name }}</option>
-                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-3">
@@ -252,29 +247,45 @@
                 $('.selectpicker').selectpicker();
 
                 // Dynamic Category Filter Based on Brand Selection
+                const initialSelectedCategories = @json((array) request('category_id', []));
+                
                 $('#brand_filter').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
-                    filterCategoriesByBrand();
+                    filterCategoriesByBrand(false);
                 });
 
-                function filterCategoriesByBrand() {
+                function filterCategoriesByBrand(isInit) {
                     let selectedBrands = $('#brand_filter').val() || [];
 
-                    $('#category_filter option').each(function() {
-                        let brandId = $(this).data('brand-id');
-
-                        if (selectedBrands.length === 0 || selectedBrands.includes(String(brandId))) {
-                            $(this).removeClass('d-none').prop('disabled', false); // Show
-                        } else {
-                            $(this).addClass('d-none').prop('disabled', true); // Hide
-                            $(this).prop('selected', false); // Deselect
+                    $.ajax({
+                        url: "{{ route('admin.categories.by_brands') }}",
+                        type: "GET",
+                        data: {
+                            brand_ids: selectedBrands
+                        },
+                        success: function(response) {
+                            let categorySelect = $('#category_filter');
+                            let currentSelectedCategories = isInit ? initialSelectedCategories : (categorySelect.val() || []);
+                            
+                            categorySelect.selectpicker('destroy');
+                            
+                            let optionsHtml = '';
+                            
+                            response.forEach(function(cat) {
+                                let isSelected = currentSelectedCategories.includes(String(cat.id)) || currentSelectedCategories.includes(Number(cat.id)) ? 'selected' : '';
+                                optionsHtml += `<option value="${cat.id}" data-brand-id="${cat.brand_id}" ${isSelected}>${cat.name}</option>`;
+                            });
+                            
+                            categorySelect.html(optionsHtml);
+                            categorySelect.selectpicker();
+                        },
+                        error: function() {
+                            console.error("Failed to load categories");
                         }
                     });
-
-                    $('#category_filter').selectpicker('refresh');
                 }
 
                 // Initialize dependent dropdown state on load
-                filterCategoriesByBrand();
+                filterCategoriesByBrand(true);
 
                 $('#date_range').daterangepicker({
                     autoUpdateInput: false,

@@ -19,14 +19,13 @@ class ProductController extends Controller
             'base_page' => 'Dashboard',
             'breadcrum_navigator' => 'Products',
         ];
+        $data['brands'] = Brand::all();
+        $data['categories'] = Category::all();
+        $data['route'] = route('admin.products.index');
+        $data['per_page'] = $request->input('per_page', 10);
         $productServiceObj = new ProductService;
         $data['filterData'] = $productServiceObj->prepareFilters($request->all());
         $data['products'] = $productServiceObj->getByFilters($data['filterData']);
-
-        $data['categories'] = Category::all();
-        $data['brands'] = Brand::all();
-        $data['route'] = route('admin.products.index');
-        $data['per_page'] = $request->input('per_page', 10);
 
         return view('admin.products.index', $data);
     }

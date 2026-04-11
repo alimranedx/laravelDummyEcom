@@ -41,6 +41,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
         // Categories
+        Route::get('categories/by-brands', [CategoryController::class, 'getCategoriesByBrands'])->name('categories.by_brands');
         Route::resource('categories', CategoryController::class);
 
         // Brands

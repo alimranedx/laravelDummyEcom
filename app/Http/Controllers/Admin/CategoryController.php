@@ -16,6 +16,19 @@ class CategoryController extends Controller
         return view('admin.categories.index', compact('categories'));
     }
 
+    public function getCategoriesByBrands(Request $request)
+    {
+        $brandIds = $request->input('brand_ids', []);
+        
+        if (empty($brandIds)) {
+            $categories = Category::select('id', 'name', 'brand_id')->get();
+        } else {
+            $categories = Category::whereIn('brand_id', $brandIds)->select('id', 'name', 'brand_id')->get();
+        }
+        
+        return response()->json($categories);
+    }
+
     public function create()
     {
         $brands = Brand::all();
