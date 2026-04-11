@@ -15,7 +15,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'page_title' => 'Product Catalog',
+            'page_title' => 'Products',
             'base_page' => 'Dashboard',
             'breadcrum_navigator' => 'Products',
         ];

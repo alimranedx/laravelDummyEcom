@@ -4,12 +4,13 @@
     <div class="container-fluid py-4 animate-fade-in">
         <div class="d-flex justify-content-between align-items-center mb-5">
             <div>
-                <h1 class="h3 fw-bold text-dark mb-1">Product Catalog</h1>
+                <h1 class="h3 fw-bold text-dark mb-1">{{ $page_title ?? '' }}</h1>
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-0 small">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}"
-                                class="text-decoration-none text-muted">Dashboard</a></li>
-                        <li class="breadcrumb-item active text-primary fw-medium" aria-current="page">Products</li>
+                                class="text-decoration-none text-muted">{{ $base_page ?? '' }}</a></li>
+                        <li class="breadcrumb-item active text-primary fw-medium" aria-current="page">
+                            {{ $breadcrum_navigator ?? '' }}</li>
                     </ol>
                 </nav>
             </div>

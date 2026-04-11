@@ -2,6 +2,8 @@
 
 namespace App\Common\Services\Utility;
 
+use Carbon\Carbon;
+
 class DateTime
 {
     /**
@@ -17,14 +19,14 @@ class DateTime
         $from = null;
         $to = null;
         if (! empty($dataRange)) {
-            $dateRange = explode(' - ', $dataRange);
+            $dateRange = explode('-', trim($dataRange));
             $from = Carbon::parse($dateRange[0])->format('Y-m-d');
             $to = Carbon::parse($dateRange[1])->format('Y-m-d');
         }
 
         return [
-            'from' => $from,
-            'to' => $to,
+             $from,
+             $to,
         ];
     }
 }

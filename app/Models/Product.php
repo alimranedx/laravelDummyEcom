@@ -36,9 +36,9 @@ class Product extends Model
     public function getByFilters(array $filters = []): Collection|LengthAwarePaginator
     {
         $query = self::query();
-
         $query->with(['category', 'brand']);
-        if (! empty($filters['date_range']) && ! empty($filters['from_date']) && ! empty($filters['to_date'])) {
+
+        if (! empty($filters['from_date']) && ! empty($filters['to_date'])) {
             $query->whereBetween('created_at', [$filters['from_date'], $filters['to_date']]);
         }
 
@@ -58,9 +58,7 @@ class Product extends Model
         }
         if (! empty($filters['q'])) {
             $query->where(function ($q) use ($filters) {
-                $q->where('name', 'like', '%'.$filters['q'].'%')
-                    ->orWhere('brand', 'like', '%'.$filters['q'].'%')
-                    ->orWhere('category', 'like', '%'.$filters['q'].'%');
+                $q->where('name', 'like', '%'.$filters['q'].'%');
             });
         }
         if (! empty($filters['per_page'])) {
