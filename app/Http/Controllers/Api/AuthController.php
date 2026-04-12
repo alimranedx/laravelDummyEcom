@@ -16,17 +16,6 @@ use App\Enums\UserType;
 class AuthController extends Controller
 {
     /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        // Require jwt authentication except for specific methods
-        $this->middleware('auth:api', ['except' => ['login', 'register', 'forgotPassword', 'resetPassword']]);
-    }
-
-    /**
      * Register a User.
      *
      * @return \Illuminate\Http\JsonResponse
