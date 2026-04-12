@@ -9,6 +9,7 @@ This is a comprehensive Laravel-based ecommerce application featuring user authe
 - **Product Management**: Brands, Categories, and Products CRUD.
 - **Sales System**: Order placement and status tracking.
 - **Admin Dashboard**: Real-time overview of the system status.
+- **REST API**: Comprehensive JWT-secured endpoints for Auth, Products, and User Dashboard to easily integrate with frontend frameworks (e.g., React, Vue).
 - **Responsive UI**: Modern, premium admin interface using Bootstrap Icons and glassmorphism-inspired design.
 
 ---
@@ -126,3 +127,28 @@ All admin routes are protected by the `CheckPagePermission` middleware.
 
 ## License
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+---
+
+## API Documentation & Usage
+
+This project exposes JWT-secured RESTful API endpoints intended for consumption by frontend frameworks such as React or mobile applications.
+
+### API Postman Setup
+To quickly test and integrate the API, a complete **Postman Collection** is included natively within the project:
+1. Locate `dummy-ecom-api.postman_collection.json` in the root of your project directory.
+2. In Postman, go to **File > Import** and select this file.
+3. Once imported, you will get pre-configured requests under the **Dummy E-Com API** collection.
+4. **Automated Authentication**: The `Login` request natively intercepts your generated `access_token` upon a successful `200 OK` response and automatically updates your Postman environment. You do not need to manually configure the Bearer Token for subsequent secure requests (e.g., calling `/api/auth/me` or `/api/user/orders`).
+
+### Key API Endpoints
+- **Public**:
+  - `POST /api/auth/login` (Returns API JWT)
+  - `POST /api/auth/register`
+  - `GET /api/products` (Accepts `?search=` and `?page=` params)
+  - `GET /api/products/{id}`
+- **Protected (Requires JWT Bearer Token)**:
+  - `GET /api/auth/me`
+  - `POST /api/auth/logout`
+  - `GET /api/user/dashboard`
+  - `GET /api/user/orders`
