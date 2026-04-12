@@ -38,12 +38,18 @@
 
         <!-- Main Content Card -->
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-            <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
+            <div class="card-header bg-white border-0 py-4 px-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
                 <h5 class="mb-0 fw-bold text-dark">Brand Portfolio</h5>
-                <div class="search-box position-relative" style="max-width: 300px;">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                    <input type="text" class="form-control rounded-pill ps-5 border-light bg-light" placeholder="Search brands...">
-                </div>
+                <form method="GET" action="{{ route('admin.brands.index') }}" class="d-flex gap-2 w-100" style="max-width: 400px;">
+                    <div class="position-relative flex-grow-1">
+                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                        <input type="text" name="q" value="{{ request('q') }}" class="form-control rounded-pill ps-5 border-light bg-light w-100" placeholder="Search brands...">
+                    </div>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium shadow-sm">Search</button>
+                    @if(request()->filled('q'))
+                        <a href="{{ route('admin.brands.index') }}" class="btn btn-light rounded-pill border px-3">Clear</a>
+                    @endif
+                </form>
             </div>
             
             <div class="table-responsive">
@@ -115,11 +121,49 @@
                 </table>
             </div>
             
-            @if($brands->hasPages())
-                <div class="card-footer bg-white py-4 px-4 border-top">
-                    {{ $brands->links() }}
+            {{-- pagination part start here ======================================= --}}
+            @php
+                $perPageOptions = [10, 20, 50, 100];
+                $perPageQuery = 'per_page';
+                $perPageQueryName = 'per_page';
+            @endphp
+            <div class="card-footer bg-white py-3 px-4 border-top">
+                <div class="row align-items-center m-0">
+                    <!-- Left: Showing X to Y -->
+                    @include('common.pagination.pagination_data_show', ['data' => $brands])
+
+                    <!-- Center: Items per page -->
+                    <div class="col-12 col-md-4 d-flex justify-content-center mb-3 mb-md-0 px-0">
+                        <form method="GET" action="{{ $route ?? url()->current() }}"
+                            class="d-flex align-items-center m-0">
+                            @foreach (request()->except($perPageQueryName ?? 'per_page') as $key => $value)
+                                @if (is_array($value))
+                                    @foreach ($value as $v)
+                                        <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                                    @endforeach
+                                @else
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endif
+                            @endforeach
+                            <label class="text-muted small me-2 mb-0 text-nowrap fw-medium">Items per
+                                page:</label>
+                            <select name="{{ $perPageQueryName ?? 'per_page' }}"
+                                class="form-select form-select-sm border-light bg-light rounded-pill fw-medium cursor-pointer"
+                                onchange="this.form.submit()" style="width: 80px; min-height: 38px;">
+                                @foreach ($perPageOptions ?? [5, 15, 30, 50] as $option)
+                                    <option value="{{ $option }}"
+                                        {{ request($perPageQueryName ?? 'per_page', 10) == $option ? 'selected' : '' }}>
+                                        {{ $option }}</option>
+                                @endforeach
+                            </select>
+                        </form>
+                    </div>
+
+                    <!-- Right: Pagination Links -->
+                    @include('common.pagination.common_pagination', ['data' => $brands])
                 </div>
-            @endif
+            </div>
+            {{-- pagination part end here ======================================= --}}
         </div>
     </div>
 
@@ -131,9 +175,12 @@
         .btn-light { background: #f8f9fa; }
         .btn-light:hover { background: #e9ecef; }
         
-        .pagination { margin-bottom: 0; }
+        .pagination { margin-bottom: 0 !important; }
         .page-link { border: none; padding: 0.5rem 0.85rem; margin: 0 2px; border-radius: 8px !important; color: #6c757d; }
         .page-item.active .page-link { background-color: #4f46e5; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
+        
+        .pagination-wrapper p.small.text-muted { display: none !important; }
+        .pagination-wrapper nav>div.d-sm-flex { justify-content: flex-end !important; }
     </style>
     @endpush
 @endsection

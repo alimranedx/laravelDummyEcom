@@ -35,12 +35,37 @@
         </div>
 
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-            <div class="card-header bg-white border-0 py-4 px-4 d-flex justify-content-between align-items-center">
-                <h5 class="mb-0 fw-bold text-dark">All Categories</h5>
-                <div class="position-relative" style="max-width:300px">
-                    <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                    <input type="text" class="form-control rounded-pill ps-5 border-light bg-light" placeholder="Search categories...">
-                </div>
+            <div class="card-header bg-white border-bottom py-4 px-4">
+                <form method="GET" action="{{ route('admin.categories.index') }}" id="filterForm">
+                    <div class="row g-3 align-items-end justify-content-end">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Brand Filter</label>
+                            <select name="brand_id[]" id="brand_filter" class="selectpicker form-control" multiple
+                                data-actions-box="true" data-live-search="true" title="All Brands">
+                                @foreach ($brands as $brand)
+                                    <option value="{{ $brand->id }}"
+                                        {{ in_array($brand->id, (array) request('brand_id')) ? 'selected' : '' }}>
+                                        {{ $brand->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="q" class="form-label small fw-bold text-muted text-uppercase mb-1">Search Keyword</label>
+                            <div class="position-relative">
+                                <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                <input type="text" name="q" id="q" class="form-control rounded-pill ps-5 border-light bg-light"
+                                    placeholder="Search categories..." value="{{ request('q') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary rounded-pill w-100 fw-bold">Filter</button>
+                            @if (request()->anyFilled(['q', 'brand_id']))
+                                <a href="{{ route('admin.categories.index') }}"
+                                    class="btn btn-light rounded-pill border w-100 fw-bold">Clear</a>
+                            @endif
+                        </div>
+                    </div>
+                </form>
             </div>
 
             <div class="table-responsive">
@@ -93,17 +118,72 @@
                     </tbody>
                 </table>
             </div>
-            @if($categories->hasPages())
-                <div class="card-footer bg-white py-4 px-4 border-top">{{ $categories->links() }}</div>
-            @endif
+            {{-- pagination part start here ======================================= --}}
+            @php
+                $perPageOptions = [10, 20, 50, 100];
+                $perPageQuery = 'per_page';
+                $perPageQueryName = 'per_page';
+            @endphp
+            <div class="card-footer bg-white py-3 px-4 border-top">
+                <div class="row align-items-center m-0">
+                    <!-- Left: Showing X to Y -->
+                    @include('common.pagination.pagination_data_show', ['data' => $categories])
+
+                    <!-- Center: Items per page -->
+                    <div class="col-12 col-md-4 d-flex justify-content-center mb-3 mb-md-0 px-0">
+                        <form method="GET" action="{{ $route ?? url()->current() }}"
+                            class="d-flex align-items-center m-0">
+                            @foreach (request()->except($perPageQueryName ?? 'per_page') as $key => $value)
+                                @if (is_array($value))
+                                    @foreach ($value as $v)
+                                        <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                                    @endforeach
+                                @else
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endif
+                            @endforeach
+                            <label class="text-muted small me-2 mb-0 text-nowrap fw-medium">Items per
+                                page:</label>
+                            <select name="{{ $perPageQueryName ?? 'per_page' }}"
+                                class="form-select form-select-sm border-light bg-light rounded-pill fw-medium cursor-pointer"
+                                onchange="this.form.submit()" style="width: 80px; min-height: 38px;">
+                                @foreach ($perPageOptions ?? [5, 15, 30, 50] as $option)
+                                    <option value="{{ $option }}"
+                                        {{ request($perPageQueryName ?? 'per_page', 10) == $option ? 'selected' : '' }}>
+                                        {{ $option }}</option>
+                                @endforeach
+                            </select>
+                        </form>
+                    </div>
+
+                    <!-- Right: Pagination Links -->
+                    @include('common.pagination.common_pagination', ['data' => $categories])
+                </div>
+            </div>
+            {{-- pagination part end here ======================================= --}}
         </div>
     </div>
     @push('styles')
+    <link rel="stylesheet" href="{{ asset('/assets/bootstrap-select-1.14.0-beta3/css/bootstrap-select.min.css') }}">
     <style>
         .transition-row { transition: background-color 0.2s; }
         .transition-row:hover { background-color: rgba(248,249,250,0.5); }
+        
+        .pagination { margin-bottom: 0 !important; }
         .page-link { border:none; padding:.5rem .85rem; margin:0 2px; border-radius:8px !important; color:#6c757d; }
         .page-item.active .page-link { background-color:#4f46e5; }
+        
+        .pagination-wrapper p.small.text-muted { display: none !important; }
+        .pagination-wrapper nav>div.d-sm-flex { justify-content: flex-end !important; }
     </style>
+    @endpush
+    @push('scripts')
+        <!-- Bootstrap Select -->
+        <script src="{{ asset('/assets/bootstrap-select-1.14.0-beta3/js/bootstrap-select.min.js') }}"></script>
+        <script>
+            $(document).ready(function() {
+                $('.selectpicker').selectpicker();
+            });
+        </script>
     @endpush
 @endsection

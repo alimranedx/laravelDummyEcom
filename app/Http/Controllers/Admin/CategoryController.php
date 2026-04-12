@@ -10,10 +10,25 @@ use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::with(['brand'])->withCount('products')->latest()->paginate(15);
-        return view('admin.categories.index', compact('categories'));
+        $per_page = $request->input('per_page', 10);
+        $q = $request->input('q');
+        $brand_ids = $request->input('brand_id', []);
+        
+        $query = Category::with(['brand'])->withCount('products')->latest();
+        
+        if (!empty($q)) {
+            $query->where('name', 'like', '%' . $q . '%');
+        }
+        if (!empty($brand_ids)) {
+            $query->whereIn('brand_id', $brand_ids);
+        }
+        
+        $categories = $query->paginate($per_page)->withQueryString();
+        $brands = Brand::all();
+        $route = route('admin.categories.index');
+        return view('admin.categories.index', compact('categories', 'brands', 'route', 'per_page'));
     }
 
     public function getCategoriesByBrands(Request $request)

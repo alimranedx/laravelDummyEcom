@@ -10,10 +10,20 @@ use Illuminate\Support\Facades\Storage;
 
 class BrandController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::withCount(['products', 'categories'])->latest()->paginate(15);
-        return view('admin.brands.index', compact('brands'));
+        $per_page = $request->input('per_page', 10);
+        $q = $request->input('q');
+        
+        $query = Brand::withCount(['products', 'categories'])->latest();
+        
+        if (!empty($q)) {
+            $query->where('name', 'like', '%' . $q . '%');
+        }
+        
+        $brands = $query->paginate($per_page)->withQueryString();
+        $route = route('admin.brands.index');
+        return view('admin.brands.index', compact('brands', 'route', 'per_page'));
     }
 
     public function create()
