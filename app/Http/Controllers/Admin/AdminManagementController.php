@@ -11,10 +11,24 @@ use Illuminate\Validation\Rules;
 
 class AdminManagementController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $admins = User::where('user_type', UserType::ADMIN)->latest()->paginate(10);
-        return view('admin.admin-management.index', compact('admins'));
+        $per_page = $request->input('per_page', 10);
+        $q = $request->input('q');
+        
+        $query = User::where('user_type', UserType::ADMIN)->latest();
+        
+        if (!empty($q)) {
+            $query->where(function($subQuery) use ($q) {
+                $subQuery->where('name', 'like', '%' . $q . '%')
+                         ->orWhere('email', 'like', '%' . $q . '%');
+            });
+        }
+        
+        $admins = $query->paginate($per_page)->withQueryString();
+        $route = route('admin.admin-management.index');
+        
+        return view('admin.admin-management.index', compact('admins', 'route', 'per_page'));
     }
 
     public function create()

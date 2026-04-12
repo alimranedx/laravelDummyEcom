@@ -8,10 +8,24 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('user')->latest()->paginate(15);
-        return view('admin.orders.index', compact('orders'));
+        $per_page = $request->input('per_page', 10);
+        $q = $request->input('q');
+        
+        $query = Order::with('user')->latest();
+        
+        if (!empty($q)) {
+            $query->where('id', 'like', '%' . $q . '%')
+                  ->orWhereHas('user', function($userQuery) use ($q) {
+                      $userQuery->where('name', 'like', '%' . $q . '%');
+                  });
+        }
+        
+        $orders = $query->paginate($per_page)->withQueryString();
+        $route = route('admin.orders.index');
+        
+        return view('admin.orders.index', compact('orders', 'route', 'per_page'));
     }
 
     public function show(Order $order)

@@ -36,13 +36,16 @@ class SaleReportController extends Controller
             }
         }
 
+        $per_page = $request->input('per_page', 10);
         $data['summary'] = [
             'total_revenue' => (clone $query)->sum('total_price'),
             'total_orders' => (clone $query)->count(),
         ];
 
-        $data['sales'] = $query->paginate(20)->withQueryString();
+        $data['sales'] = $query->paginate($per_page)->withQueryString();
         $data['statuses'] = OrderStatus::cases();
+        $data['route'] = route('admin.sale-report.index');
+        $data['per_page'] = $per_page;
 
         return view('admin.sale-report.index', $data);
     }

@@ -1,6 +1,7 @@
 @extends('admin.layout')
 
 @push('styles')
+    <link rel="stylesheet" href="{{ asset('/assets/bootstrap-select-1.14.0-beta3/css/bootstrap-select.min.css') }}">
     <style>
         /* Filter Premium UI */
         .filter-card {
@@ -135,6 +136,10 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
             border: 1px solid #e2e8f0 !important;
         }
+        
+        .page-item.active .page-link { background-color: #4f46e5; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2); }
+        .pagination-wrapper p.small.text-muted { display: none !important; }
+        .pagination-wrapper nav>div.d-sm-flex { justify-content: flex-end !important; }
     </style>
 @endpush
 
@@ -194,21 +199,26 @@
             {{-- Filter Row --}}
             <div class="card-header bg-white border-bottom py-4 px-4">
                 <form method="GET" action="{{ route('admin.sale-report.index') }}" id="filterForm">
-                    {{-- Active filter tags --}}
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="date_range">{{ __('Date Range') }}</label>
-                            <input class="form-control" type="text" name="date_range" id=date_range value="" />
+                    <div class="row g-3 align-items-end justify-content-end">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Date Range</label>
+                            <input class="form-control rounded-pill border-light bg-light py-2 px-4 shadow-sm" type="text" name="date_range" id="date_range" value="{{ request('date_range') }}" placeholder="YYYY/MM/DD - YYYY/MM/DD"/>
                         </div>
-                        <div class="col-md-6">
-                            <label for="">{{ __('Status') }}</label>
-                            <select class="selectpicker">
-                                <option>Mustard</option>
-                                <option>Ketchup</option>
-                                <option>Barbecue</option>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Status Filter</label>
+                            <select name="status[]" id="status_filter" class="selectpicker form-control" multiple data-actions-box="true" title="All Statuses">
+                                @foreach ($statuses as $status)
+                                    <option value="{{ $status->value }}" {{ in_array($status->value, (array) request('status')) ? 'selected' : '' }}>
+                                        {{ $status->label() }}
+                                    </option>
+                                @endforeach
                             </select>
-
-
+                        </div>
+                        <div class="col-md-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary rounded-pill w-100 fw-bold shadow-sm py-2">Filter</button>
+                            @if (request()->anyFilled(['date_range', 'status']))
+                                <a href="{{ route('admin.sale-report.index') }}" class="btn btn-light rounded-pill border w-100 fw-bold text-center py-2 d-flex align-items-center justify-content-center">Clear</a>
+                            @endif
                         </div>
                     </div>
                 </form>
@@ -270,17 +280,57 @@
                 </table>
             </div>
 
-            @if ($sales->hasPages())
-                <div class="card-footer bg-white py-4 px-4 border-top">
-                    {{ $sales->links() }}
+            {{-- pagination part start here ======================================= --}}
+            @php
+                $perPageOptions = [10, 20, 50, 100];
+                $perPageQuery = 'per_page';
+                $perPageQueryName = 'per_page';
+            @endphp
+            <div class="card-footer bg-white py-3 px-4 border-top">
+                <div class="row align-items-center m-0">
+                    <!-- Left: Showing X to Y -->
+                    @include('common.pagination.pagination_data_show', ['data' => $sales])
+
+                    <!-- Center: Items per page -->
+                    <div class="col-12 col-md-4 d-flex justify-content-center mb-3 mb-md-0 px-0">
+                        <form method="GET" action="{{ $route ?? url()->current() }}"
+                            class="d-flex align-items-center m-0">
+                            @foreach (request()->except($perPageQueryName ?? 'per_page') as $key => $value)
+                                @if (is_array($value))
+                                    @foreach ($value as $v)
+                                        <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                                    @endforeach
+                                @else
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endif
+                            @endforeach
+                            <label class="text-muted small me-2 mb-0 text-nowrap fw-medium">Items per
+                                page:</label>
+                            <select name="{{ $perPageQueryName ?? 'per_page' }}"
+                                class="form-select form-select-sm border-light bg-light rounded-pill fw-medium cursor-pointer"
+                                onchange="this.form.submit()" style="width: 80px; min-height: 38px;">
+                                @foreach ($perPageOptions ?? [5, 15, 30, 50] as $option)
+                                    <option value="{{ $option }}"
+                                        {{ request($perPageQueryName ?? 'per_page', 10) == $option ? 'selected' : '' }}>
+                                        {{ $option }}</option>
+                                @endforeach
+                            </select>
+                        </form>
+                    </div>
+
+                    <!-- Right: Pagination Links -->
+                    @include('common.pagination.common_pagination', ['data' => $sales])
                 </div>
-            @endif
+            </div>
+            {{-- pagination part end here ======================================= --}}
         </div>
 
     </div>
 @endsection
 
 @push('scripts')
+    <!-- Bootstrap Select -->
+    <script src="{{ asset('/assets/bootstrap-select-1.14.0-beta3/js/bootstrap-select.min.js') }}"></script>
     <script>
         $('#date_range').daterangepicker({
             autoUpdateInput: true,
@@ -306,7 +356,7 @@
             }
         });
         $(function() {
-            $('select').selectpicker();
+            $('.selectpicker').selectpicker();
         });
     </script>
 @endpush
