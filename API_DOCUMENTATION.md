@@ -168,3 +168,72 @@ Fetches a paginated list of all orders tied to the logged-in user account.
 - **Query Parameters:**
   - `page` (optional, integer): Defaults to page 1
 - **Success Response (200 OK):** Returns a paginated JSON object of user orders.
+
+### 3. View Single Order Details
+Fetches complete details for a specific order, including its products.
+
+- **Endpoint:** `GET /user/orders/{id}`
+- **Access:** Protected (Requires JWT Token)
+- **Success Response (200 OK):** Returns the order object with related items and product data.
+
+### 4. Cancel Order
+Allows the user to cancel a pending order.
+
+- **Endpoint:** `POST /api/user/orders/{id}/cancel`
+- **Access:** Protected (Requires JWT Token)
+- **Success Response (200 OK):** `{"success": true, "message": "Order cancelled successfully"}`
+- **Error Response (400 Bad Request):** Returns error if order is not in `pending` status.
+
+---
+
+## Checkout & Processing Endpoints
+
+### 1. Process Order (Checkout)
+Creates a new order and prepares it for fulfillment. This endpoint handles stock validation and calculation.
+
+- **Endpoint:** `POST /user/checkout`
+- **Access:** Protected (Requires JWT Token)
+- **Request Body:**
+  ```json
+  {
+    "items": [
+      { "product_id": 1, "quantity": 2 },
+      { "product_id": 5, "quantity": 1 }
+    ],
+    "shipping_address": "123 Main St, Springfield",
+    "payment_method": "Stripe"
+  }
+  ```
+- **Success Response (201 Created):** Returns the newly created order object.
+- **Error Response (400 Bad Request):** Returns error if stock is insufficient.
+
+---
+
+## Wishlist Endpoints
+
+### 1. Retrieve Wishlist
+Fetches all products currently saved in the user's wishlist.
+
+- **Endpoint:** `GET /user/wishlist`
+- **Access:** Protected (Requires JWT Token)
+- **Success Response (200 OK):** `{"success": true, "data": [...]}`
+
+### 2. Add to Wishlist
+Saves a product to the user's wishlist.
+
+- **Endpoint:** `POST /user/wishlist`
+- **Access:** Protected (Requires JWT Token)
+- **Request Body:**
+  ```json
+  {
+    "product_id": 10
+  }
+  ```
+- **Success Response (201 Created):** `{"success": true, "message": "Product added to wishlist successfully"}`
+
+### 3. Remove from Wishlist
+Deletes a product from the user's wishlist.
+
+- **Endpoint:** `DELETE /user/wishlist/{product_id}`
+- **Access:** Protected (Requires JWT Token)
+- **Success Response (200 OK):** `{"success": true, "message": "Product removed from wishlist successfully"}`

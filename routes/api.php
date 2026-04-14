@@ -46,4 +46,16 @@ Route::group(['prefix' => 'products'], function ($router) {
 Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function ($router) {
     Route::get('/dashboard', [UserController::class, 'dashboard']);            // Retrieve user dashboard data/metrics
     Route::get('/orders', [UserController::class, 'orders']);                  // Retrieve user's past and current orders
+
+    // Wishlist Routes
+    Route::group(['prefix' => 'wishlist'], function() {
+        Route::get('/', [\App\Http\Controllers\Api\WishlistController::class, 'index']);
+        Route::post('/', [\App\Http\Controllers\Api\WishlistController::class, 'store']);
+        Route::delete('/{product_id}', [\App\Http\Controllers\Api\WishlistController::class, 'destroy']);
+    });
+
+    // Checkout / Order Routes
+    Route::post('/checkout', [\App\Http\Controllers\Api\OrderController::class, 'store']);
+    Route::get('/orders/{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
+    Route::post('/orders/{id}/cancel', [\App\Http\Controllers\Api\OrderController::class, 'cancel']);
 });

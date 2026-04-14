@@ -206,5 +206,82 @@ When accessing a protected endpoint, you <strong>must</strong> pass the JWT toke
     <li><strong>Success Response (200 OK):</strong> Returns a paginated JSON object of user orders.</li>
 </ul>
 
+<h3>3. View Single Order Details</h3>
+<p>Fetches complete details for a specific order, including its products.</p>
+<ul>
+    <li><strong>Endpoint:</strong> <code>GET /user/orders/{id}</code></li>
+    <li><strong>Access:</strong> Protected (Requires JWT Token)</li>
+    <li><strong>Success Response (200 OK):</strong> Returns the order object with related items and product data.</li>
+</ul>
+
+<h3>4. Cancel Order</h3>
+<p>Allows the user to cancel a pending order.</p>
+<ul>
+    <li><strong>Endpoint:</strong> <code>POST /api/user/orders/{id}/cancel</code></li>
+    <li><strong>Access:</strong> Protected (Requires JWT Token)</li>
+    <li><strong>Success Response (200 OK):</strong> <code>{"success": true, "message": "Order cancelled successfully"}</code></li>
+    <li><strong>Error Response (400 Bad Request):</strong> Returns error if order is not in <code>pending</code> status.</li>
+</ul>
+
+<hr>
+
+<h2>Checkout & Processing Endpoints</h2>
+
+<h3>1. Process Order (Checkout)</h3>
+<p>Creates a new order and prepares it for fulfillment. This endpoint handles stock validation and calculation.</p>
+<ul>
+    <li><strong>Endpoint:</strong> <code>POST /user/checkout</code></li>
+    <li><strong>Access:</strong> Protected (Requires JWT Token)</li>
+    <li><strong>Request Body:</strong>
+<pre>
+{
+  "items": [
+    { "product_id": 1, "quantity": 2 },
+    { "product_id": 5, "quantity": 1 }
+  ],
+  "shipping_address": "123 Main St, Springfield",
+  "payment_method": "Stripe"
+}
+</pre>
+    </li>
+    <li><strong>Success Response (201 Created):</strong> Returns the newly created order object.</li>
+    <li><strong>Error Response (400 Bad Request):</strong> Returns error if stock is insufficient.</li>
+</ul>
+
+<hr>
+
+<h2>Wishlist Endpoints</h2>
+
+<h3>1. Retrieve Wishlist</h3>
+<p>Fetches all products currently saved in the user's wishlist.</p>
+<ul>
+    <li><strong>Endpoint:</strong> <code>GET /user/wishlist</code></li>
+    <li><strong>Access:</strong> Protected (Requires JWT Token)</li>
+    <li><strong>Success Response (200 OK):</strong> <code>{"success": true, "data": [...]}</code></li>
+</ul>
+
+<h3>2. Add to Wishlist</h3>
+<p>Saves a product to the user's wishlist.</p>
+<ul>
+    <li><strong>Endpoint:</strong> <code>POST /user/wishlist</code></li>
+    <li><strong>Access:</strong> Protected (Requires JWT Token)</li>
+    <li><strong>Request Body:</strong>
+<pre>
+{
+  "product_id": 10
+}
+</pre>
+    </li>
+    <li><strong>Success Response (201 Created):</strong> <code>{"success": true, "message": "Product added to wishlist successfully"}</code></li>
+</ul>
+
+<h3>3. Remove from Wishlist</h3>
+<p>Deletes a product from the user's wishlist.</p>
+<ul>
+    <li><strong>Endpoint:</strong> <code>DELETE /user/wishlist/{product_id}</code></li>
+    <li><strong>Access:</strong> Protected (Requires JWT Token)</li>
+    <li><strong>Success Response (200 OK):</strong> <code>{"success": true, "message": "Product removed from wishlist successfully"}</code></li>
+</ul>
+
 </body>
 </html>
