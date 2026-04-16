@@ -29,7 +29,13 @@ class ProductController extends Controller
             $query->where('status', 'active'); // Example status column config
         }
 
-        $products = $query->latest()->paginate(12);
+        $perPage = $request->get('per_page', 12);
+        
+        // Safety cap to prevent server overload
+        $perPage = min((int)$perPage, 100);
+
+        $products = $query->latest()->paginate($perPage);
+
 
         return response()->json($products);
     }

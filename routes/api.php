@@ -43,6 +43,13 @@ Route::group(['prefix' => 'products'], function ($router) {
 | and personal data like order history. Requires valid JWT token.
 |
 */
+/*
+|--------------------------------------------------------------------------
+| Guest Checkout (Cash on Delivery - No Login Required)
+|--------------------------------------------------------------------------
+*/
+Route::post('/guest-checkout', [\App\Http\Controllers\Api\OrderController::class, 'guestStore']);
+
 Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function ($router) {
     Route::get('/dashboard', [UserController::class, 'dashboard']);            // Retrieve user dashboard data/metrics
     Route::get('/orders', [UserController::class, 'orders']);                  // Retrieve user's past and current orders

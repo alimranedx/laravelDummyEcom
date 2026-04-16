@@ -12,7 +12,8 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['user_id', 'total_price', 'status', 'payment_status', 'payment_method', 'shipping_address'];
+    protected $fillable = ['user_id', 'guest_phone', 'total_price', 'status', 'payment_status', 'payment_method', 'shipping_address'];
+
 
     protected $casts = [
         'status' => OrderStatus::class,
