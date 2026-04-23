@@ -54,15 +54,7 @@
                                             <td class="px-4 py-3">
                                                 <div class="rounded-3 overflow-hidden shadow-sm border"
                                                     style="width: 48px; height: 48px;">
-                                                    @if ($item->product->image)
-                                                        <img src="{{ asset('storage/' . $item->product->image) }}"
-                                                            class="w-100 h-100" style="object-fit: cover;">
-                                                    @else
-                                                        <div
-                                                            class="bg-light w-100 h-100 d-flex align-items-center justify-content-center">
-                                                            <i class="bi bi-image text-muted small"></i>
-                                                        </div>
-                                                    @endif
+                                                    <img src="{{ $item->product->image_url }}" class="w-100 h-100" style="object-fit: cover;">
                                                 </div>
                                             </td>
                                             <td class="px-4 py-3 fw-bold text-dark">{{ $item->product->name }}</td>
