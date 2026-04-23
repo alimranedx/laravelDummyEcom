@@ -40,10 +40,11 @@ npm install
 ```
 
 ### 3. Environment Configuration
-Copy the example environment file and generate the application key:
+Copy the example environment file, generate the application key, and generate the JWT authentication secret:
 ```bash
 cp .env.example .env
 php artisan key:generate
+php artisan jwt:secret
 ```
 
 ### 4. Database Setup
@@ -67,6 +68,16 @@ npm run dev
 php artisan serve
 ```
 The application will be available at `http://localhost:8000`.
+
+### 8. Pulling Updates from Git
+When you pull new updates from the Git repository, it's crucial to update your dependencies and clear the application cache to avoid unexpected errors:
+```bash
+git pull
+composer install
+php artisan config:clear
+php artisan optimize:clear
+```
+*(If frontend dependencies or assets have changed, you may also need to run `npm install && npm run build`)*
 
 ---
 
@@ -152,3 +163,21 @@ To quickly test and integrate the API, a complete **Postman Collection** is incl
   - `POST /api/auth/logout`
   - `GET /api/user/dashboard`
   - `GET /api/user/orders`
+
+### JWT Implementation Details
+
+This project uses the `tymon/jwt-auth` package to manage secure API authentication.
+
+#### Configuration
+- **Guard:** The `api` guard is configured to use the `jwt` driver in `config/auth.php`.
+- **Model:** The `User` model implements the `Tymon\JWTAuth\Contracts\JWTSubject` interface, which provides the `getJWTIdentifier()` and `getJWTCustomClaims()` methods.
+- **Middleware:** Protected API routes enforce authentication using the standard `auth:api` middleware.
+
+#### Token Lifecycle
+1. **Login:** Send a `POST` request to `/api/auth/login` with your `email` and `password`. On success, the server responds with an `access_token` and the `expires_in` duration.
+2. **Usage:** Include the token in the `Authorization` header of all protected requests:
+   ```http
+   Authorization: Bearer <your_token_here>
+   ```
+3. **Refresh:** Send a `POST` request to `/api/auth/refresh` to obtain a fresh token when the existing one expires.
+4. **Logout:** Send a `POST` request to `/api/auth/logout` to invalidate the current token on the server, ensuring it can no longer be used.
