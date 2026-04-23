@@ -149,7 +149,23 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        $product->delete();
+        // Delete related images from storage
+        foreach ($product->images as $image) {
+            if ($image->image_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($image->image_path);
+            }
+        }
+        
+        // Delete related image records
+        $product->images()->delete();
+
+        // Delete primary image from storage
+        if ($product->image_path) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image_path);
+        }
+
+        // Force delete to ensure complete removal from DB
+        $product->forceDelete();
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Product deleted successfully.');
