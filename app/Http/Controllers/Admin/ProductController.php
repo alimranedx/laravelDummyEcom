@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -47,16 +48,28 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'image_path' => 'nullable|image|max:2048',
+            'images' => 'nullable|array|max:10',
+            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
 
-        if ($request->hasFile('image_path')) {
-            $validated['image_path'] = $request->file('image_path')->store('products', 'public');
-        }
+        $product = Product::create($validated);
 
-        Product::create($validated);
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                $path = $image->store('products', 'public');
+                
+                // Set the first image as the primary image for the product
+                if ($index === 0) {
+                    $product->update(['image_path' => $path]);
+                }
+
+                $product->images()->create([
+                    'image_path' => $path,
+                ]);
+            }
+        }
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Product created successfully.');
@@ -86,16 +99,49 @@ class ProductController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'image_path' => 'nullable|image|max:2048',
+            'images' => 'nullable|array|max:10',
+            'images.*' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'deleted_images' => 'nullable|array',
+            'deleted_images.*' => 'exists:product_images,id'
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
 
-        if ($request->hasFile('image_path')) {
-            $validated['image_path'] = $request->file('image_path')->store('products', 'public');
+        $product->update($validated);
+
+        // Handle deleted images
+        if ($request->has('deleted_images')) {
+            foreach ($request->input('deleted_images') as $imageId) {
+                $image = $product->images()->find($imageId);
+                if ($image) {
+                    if ($image->image_path) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($image->image_path);
+                    }
+                    $image->delete();
+                }
+            }
         }
 
-        $product->update($validated);
+        // Handle new images
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $path = $image->store('products', 'public');
+                $product->images()->create([
+                    'image_path' => $path,
+                ]);
+            }
+        }
+
+        // Update primary image if empty and we have images
+        if (!$product->image_path && $product->images()->exists()) {
+            $product->update(['image_path' => $product->images()->first()->image_path]);
+        } else if ($product->image_path && !$product->images()->where('image_path', $product->image_path)->exists() && $product->images()->exists()) {
+            // If primary image was deleted from gallery, set another one as primary
+            $product->update(['image_path' => $product->images()->first()->image_path]);
+        } else if (!$product->images()->exists()) {
+            // No images left
+            $product->update(['image_path' => null]);
+        }
 
         return redirect()->route('admin.products.index')
             ->with('success', 'Product updated successfully.');

@@ -92,9 +92,13 @@
 
                                 <!-- Product Image -->
                                 <div class="col-12">
-                                    <label for="image_path" class="form-label small fw-bold text-uppercase text-dark" style="letter-spacing:1px">Product Image</label>
-                                    <input type="file" class="form-control bg-light border-0 @error('image_path') is-invalid @enderror" id="image_path" name="image_path" accept="image/*">
-                                    @error('image_path')<div class="invalid-feedback d-block mt-1">{{ $message }}</div>@enderror
+                                    <label for="images" class="form-label small fw-bold text-uppercase text-dark" style="letter-spacing:1px">Product Images</label>
+                                    <input type="file" class="form-control bg-light border-0 @error('images.*') is-invalid @enderror" id="images" name="images[]" accept=".jpg,.jpeg,.png,.gif" multiple>
+                                    <small class="text-muted mt-2 d-block">You can upload up to 10 images. Allowed formats: JPG, JPEG, PNG, GIF.</small>
+                                    @error('images.*')<div class="invalid-feedback d-block mt-1">{{ $message }}</div>@enderror
+                                    
+                                    <!-- Image Preview Container -->
+                                    <div id="image-preview-container" class="mt-3 d-flex flex-wrap gap-3"></div>
                                 </div>
 
                                 <div class="col-12 mt-4">
@@ -111,6 +115,7 @@
     </div>
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function loadCategories(brandId) {
         const categorySelect = document.getElementById('category_id');
@@ -128,6 +133,28 @@
             })
             .catch(error => console.error('Error fetching categories:', error));
     }
+
+    $(document).ready(function() {
+        $('#images').on('change', function(e) {
+            $('#image-preview-container').empty();
+            let files = e.target.files;
+            
+            if (files) {
+                $.each(files, function(index, file) {
+                    let reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        let imgElement = $('<img>').attr('src', e.target.result)
+                                                  .addClass('img-thumbnail')
+                                                  .css({'width': '100px', 'height': '100px', 'object-fit': 'cover'});
+                        $('#image-preview-container').append(imgElement);
+                    }
+                    
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+    });
 </script>
 @endpush
 @endsection

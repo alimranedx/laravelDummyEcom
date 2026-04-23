@@ -4,17 +4,27 @@
     <div class="container py-5 animate-fade-in">
         <div class="row g-5">
             <div class="col-md-6">
-                <div class="premium-card p-0 shadow-lg border-0 bg-transparent rounded-4 overflow-hidden">
+                <div class="premium-card p-0 shadow-lg border-0 bg-transparent rounded-4 overflow-hidden mb-3">
                     @if($product->image_path)
-                        <img src="{{ asset('storage/' . $product->image_path) }}" class="img-fluid w-100"
-                            style="min-height: 500px; object-fit: cover;" alt="{{ $product->name }}">
+                        <img id="mainProductImage" src="{{ asset('storage/' . $product->image_path) }}" class="img-fluid w-100"
+                            style="height: 500px; object-fit: cover;" alt="{{ $product->name }}">
                     @else
                         <div class="bg-white d-flex align-items-center justify-content-center rounded-4"
-                            style="min-height: 500px;">
+                            style="height: 500px;">
                             <i class="bi bi-image text-muted display-1"></i>
                         </div>
                     @endif
                 </div>
+                
+                @if($product->images && $product->images->count() > 0)
+                <div class="d-flex gap-2 overflow-auto py-2" style="scrollbar-width: thin;">
+                    @foreach($product->images as $image)
+                        <div class="rounded-3 overflow-hidden cursor-pointer flex-shrink-0" onclick="document.getElementById('mainProductImage').src='{{ $image->image_url }}'" style="width: 80px; height: 80px; cursor: pointer;">
+                            <img src="{{ $image->image_url }}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="{{ $product->name }} Thumbnail">
+                        </div>
+                    @endforeach
+                </div>
+                @endif
             </div>
             <div class="col-md-6">
                 <nav aria-label="breadcrumb" class="mb-4">

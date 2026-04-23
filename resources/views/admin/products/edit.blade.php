@@ -92,16 +92,27 @@
 
                                 <!-- Product Image -->
                                 <div class="col-12">
-                                    <label class="form-label small fw-bold text-uppercase text-dark" style="letter-spacing:1px">Product Image</label>
-                                    @if($product->image_path)
-                                        <div class="mb-3">
-                                            <div class="rounded-3 overflow-hidden shadow-sm border d-inline-block">
-                                                <img src="{{ asset('storage/' . $product->image_path) }}" alt="{{ $product->name }}" style="max-height:120px; object-fit:cover">
-                                            </div>
+                                    <label class="form-label small fw-bold text-uppercase text-dark" style="letter-spacing:1px">Product Images</label>
+                                    
+                                    @if($product->images->count() > 0)
+                                        <div class="mb-3 d-flex flex-wrap gap-3" id="existing-images">
+                                            @foreach($product->images as $image)
+                                                <div class="position-relative d-inline-block image-wrapper" id="image-wrapper-{{ $image->id }}">
+                                                    <img src="{{ $image->image_url }}" alt="{{ $product->name }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: cover;">
+                                                    <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 rounded-circle remove-image-btn" data-image-id="{{ $image->id }}" style="transform: translate(30%, -30%); width: 24px; height: 24px; padding: 0; line-height: 1;">&times;</button>
+                                                </div>
+                                            @endforeach
                                         </div>
                                     @endif
-                                    <input type="file" class="form-control bg-light border-0 @error('image_path') is-invalid @enderror" id="image_path" name="image_path" accept="image/*">
-                                    @error('image_path')<div class="invalid-feedback d-block mt-1">{{ $message }}</div>@enderror
+
+                                    <div id="deleted-images-container"></div>
+                                    
+                                    <input type="file" class="form-control bg-light border-0 @error('images.*') is-invalid @enderror" id="images" name="images[]" accept=".jpg,.jpeg,.png,.gif" multiple>
+                                    <small class="text-muted mt-2 d-block">You can upload up to 10 images. Allowed formats: JPG, JPEG, PNG, GIF.</small>
+                                    @error('images.*')<div class="invalid-feedback d-block mt-1">{{ $message }}</div>@enderror
+                                    
+                                    <!-- Image Preview Container for New Images -->
+                                    <div id="image-preview-container" class="mt-3 d-flex flex-wrap gap-3"></div>
                                 </div>
 
                                 <div class="col-12 mt-4">
@@ -118,6 +129,7 @@
     </div>
 
 @push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     function loadCategories(brandId) {
         const categorySelect = document.getElementById('category_id');
@@ -135,6 +147,38 @@
             })
             .catch(error => console.error('Error fetching categories:', error));
     }
+
+    $(document).ready(function() {
+        // Handle removal of existing images
+        $('.remove-image-btn').on('click', function() {
+            let imageId = $(this).data('image-id');
+            // Hide the image wrapper
+            $(`#image-wrapper-${imageId}`).hide();
+            // Add hidden input to form
+            $('#deleted-images-container').append(`<input type="hidden" name="deleted_images[]" value="${imageId}">`);
+        });
+
+        // Handle preview of new images
+        $('#images').on('change', function(e) {
+            $('#image-preview-container').empty();
+            let files = e.target.files;
+            
+            if (files) {
+                $.each(files, function(index, file) {
+                    let reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        let imgElement = $('<img>').attr('src', e.target.result)
+                                                  .addClass('img-thumbnail border-success border-2')
+                                                  .css({'width': '100px', 'height': '100px', 'object-fit': 'cover'});
+                        $('#image-preview-container').append(imgElement);
+                    }
+                    
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+    });
 </script>
 @endpush
 @endsection
