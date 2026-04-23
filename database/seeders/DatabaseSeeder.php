@@ -19,10 +19,6 @@ class DatabaseSeeder extends Seeder
             RolePermissionSeeder::class,
             AdminUserSeeder::class,
             AdminModuleSeeder::class,
-            ModuleSeeder::class,
-            PageSeeder::class,
-            RolePermissionSeeder::class,
-            SubModuleSeeder::class
         ]);
     }
 }
