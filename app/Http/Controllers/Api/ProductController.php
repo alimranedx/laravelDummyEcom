@@ -15,7 +15,7 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Product::query();
+        $query = Product::query()->with(['category', 'brand', 'images']);
 
         // Optional basic search filter
         if ($request->has('search')) {
@@ -48,7 +48,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        $product = Product::find($id);
+        $product = Product::with(['category', 'brand', 'images'])->find($id);
 
         if (!$product) {
             return response()->json(['message' => 'Product not found'], 404);
