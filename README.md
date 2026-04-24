@@ -1,139 +1,131 @@
-# Laravel Dummy Ecommerce Project
+# 🛍️ Laravel Dummy Ecommerce Project
 
-This is a comprehensive Laravel-based ecommerce application featuring user authentication, a hierarchical Role-Based Access Control (RBAC) system, and standard e-commerce features.
+[![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php)](https://www.php.net/)
+[![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql)](https://www.mysql.com/)
 
-## Features
-- **Authentication**: Secure login and registration.
-- **Dynamic RBAC**: Hierarchical permission system (Module > Sub-module > Page) with a custom middleware.
-- **User Types**: Managed through Enums (Super Admin, Admin, and Regular User).
-- **Product Management**: Brands, Categories, and Products CRUD.
-- **Sales System**: Order placement and status tracking.
-- **Admin Dashboard**: Real-time overview of the system status.
-- **Live Notifications**: Real-time admin notifications for sales and user registrations powered by Laravel Reverb WebSockets with a persistent database storage system.
-- **REST API**: Comprehensive JWT-secured endpoints for Auth, Products, and User Dashboard to easily integrate with frontend frameworks (e.g., React, Vue).
-- **Responsive UI**: Modern, premium admin interface using Bootstrap Icons and glassmorphism-inspired design.
+A comprehensive, production-ready Laravel ecommerce application featuring a robust hierarchical Role-Based Access Control (RBAC) system, real-time notifications via WebSockets, and a fully-featured REST API.
 
 ---
 
-## Prerequisites
-Ensure you have the following installed on your system:
+## ✨ Key Features
+
+- **🔐 Secure Authentication**: Multi-guard authentication for Users and Admins.
+- **🛡️ Dynamic RBAC**: Sophisticated hierarchical permission system (Module > Sub-module > Page) with custom enforcement middleware.
+- **🔔 Live Notifications**: Real-time admin alerts for sales and registrations powered by **Laravel Reverb WebSockets** with persistent database tracking.
+- **🚀 RESTful API**: JWT-secured endpoints for seamless integration with mobile apps and modern frontend frameworks (React, Vue, etc.).
+- **📦 Inventory Management**: Complete CRUD for Brands, Categories, and Products.
+- **💳 Sales System**: Order processing, status management, and dashboard analytics.
+- **🎨 Premium UI**: Modern, responsive admin interface featuring glassmorphism elements and Bootstrap 5.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Backend**: Laravel 11.x
+- **Frontend**: Blade, Bootstrap 5, Alpine.js, Vite
+- **WebSockets**: Laravel Reverb
+- **API Auth**: JWT (`tymon/jwt-auth`)
+- **Database**: MySQL 8.0+
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
 - **PHP**: ^8.2
 - **Composer**: ^2.0
-- **Node.js & NPM**: Latest stable versions
-- **MySQL**: (Laragon is highly recommended for Windows users)
+- **Node.js & NPM**: Latest LTS
+- **Database**: MySQL (Laragon recommended for Windows)
+
+### Installation Steps
+
+1. **Clone & Install**
+   ```bash
+   git clone <repository-url>
+   cd laravelDummyEcom
+   composer install
+   npm install
+   ```
+
+2. **Environment Setup**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   php artisan jwt:secret
+   ```
+
+3. **Broadcasting & Live Notifications (Reverb)**
+   Generate fresh WebSocket keys for your local machine:
+   ```bash
+   php artisan install:broadcasting --reverb
+   ```
+
+4. **Database Configuration**
+   - Create a database named `laravel_dummy_ecom`.
+   - Update `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` in your `.env`.
+
+5. **Migrate & Seed**
+   ```bash
+   php artisan migrate --seed
+   php artisan storage:link
+   ```
+
+6. **Compile Assets & Run**
+   Open two terminals:
+   - **Terminal 1 (App)**: `php artisan serve` and `npm run dev`
+   - **Terminal 2 (WebSockets)**: `php artisan reverb:start`
 
 ---
 
-## Installation & Setup
+## 🔄 Maintenance & Updates
 
-Follow these steps to get the project running locally:
-
-### 1. Clone the Repository
-```bash
-git clone <repository-url>
-cd laravelDummyEcom
-```
-
-### 2. Install Dependencies
-```bash
-composer install
-npm install
-```
-
-### 3. Environment Configuration
-Copy the example environment file, generate the application key, and generate the JWT authentication secret:
-```bash
-cp .env.example .env
-php artisan key:generate
-php artisan jwt:secret
-```
-
-### 4. Database Setup
-1. Create a new database named `laravel_dummy_ecom` in your MySQL server.
-2. Update your `.env` file with your database credentials.
-
-### 5. Run Migrations & Seeders
-This will set up the table structure, create the default roles, and seed the hierarchical permission system:
-```bash
-php artisan migrate --seed
-```
-
-### 6. Storage Link & Asset Compilation
-```bash
-php artisan storage:link
-npm run dev
-```
-
-### 7. Start the Server
-```bash
-php artisan serve
-```
-The application will be available at `http://localhost:8000`.
-
-### 8. Start WebSockets Server (Reverb)
-To enable live notifications on the admin panel, you must start the Reverb server in a separate terminal:
-```bash
-php artisan reverb:start
-```
-
-### 9. Pulling Updates from Git
-When you pull new updates from the Git repository, it's crucial to update your dependencies and clear the application cache to avoid unexpected errors:
+### Pulling Latest Changes
+When pulling updates from Git, always run this sequence to ensure your environment stays in sync:
 ```bash
 git pull
 composer install
+npm install
+php artisan migrate
+php artisan db:seed
 php artisan config:clear
 php artisan optimize:clear
 ```
-*(If frontend dependencies or assets have changed, you may also need to run `npm install && npm run build`)*
+> [!IMPORTANT]
+> If Reverb configuration changed, remember to restart the server: `php artisan reverb:start`. Also, ensure `BROADCAST_CONNECTION=reverb` is set in your `.env`.
 
 ---
 
-## Developer Documentation: Implementing New Features
+## 🛠️ Developer Guide: RBAC System
 
-This project uses a custom, database-driven hierarchical permission system. Follow these steps when adding a new module or feature to ensure it integrates with the RBAC and Dynamic Sidebar.
+This project uses a database-driven hierarchical permission system.
 
-### 1. The Permission Hierarchy
-Permissions are structured as:
-`Module` > `Sub-module` (associated with a Controller) > `Page` (associated with a Controller Method)
+### Permission Hierarchy
+`Module` > `Sub-module` (Controller) > `Page` (Method)
 
-- **Modules**: High-level groupings (e.g., "Inventory", "RBAC").
-- **Sub-modules**: Specific features (e.g., "Brands", "Role Permission Association").
-- **Pages**: Individual actions/methods (e.g., `index`, `create`, `store`).
-
-### 2. Adding a New Feature Step-by-Step
-
-#### Step A: Create the Controller and Routes
-1. Create your controller: `php artisan make:controller Admin/YourFeatureController -r`
-2. Define your routes in `routes/admin.php` within the `check_page_permission` middleware group.
-3. **CRITICAL: Route Naming Convention**
-   The sidebar generates links automatically based on the sub-module name. To ensure compatibility:
-   - Use kebab-case of the sub-module name as the route prefix.
-   - Example: Sub-module "Sale Report" -> Route name should start with `admin.sale-report.`
-   - Example Route: `Route::get('sale-report', [SaleReportController::class, 'index'])->name('admin.sale-report.index');`
-
-#### Step B: Register in `AdminModuleSeeder`
-You must register your new feature in `database/seeders/AdminModuleSeeder.php` so the system knows it exists.
-1. Add your module/sub-module definition to the `$modules` array.
-2. Specify the `controller_name` (e.g., `App\Http\Controllers\Admin\SaleReportController`).
-3. Define the `pages` array (e.g., `['index' => 2, 'create' => 2, 'store' => 1]`).
-   - `method_type` constants: `1=Post`, `2=Get`, `3=Put`, `4=Delete`.
-4. Re-run seed: `php artisan db:seed --class=AdminModuleSeeder`
-
-#### Step C: Sidebar Integration
-The sidebar in `resources/views/admin/layout.blade.php` automatically renders modules and sub-modules.
-- The system searches for a route named: `admin.str_replace(' ','-',{kebab-case-sub-module-name}).{default_method}`.
-- If your route doesn't follow this, you can add a manual override in the `@if (!Route::has($routeName))` block in `layout.blade.php`.
-
-### 3. Permission Enforcement
-All admin routes are protected by the `CheckPagePermission` middleware.
-1. It looks up the `pages` table using the current `Controller@method`.
-2. It checks the `role_pages` table to see if any of the user's roles are associated with that page ID.
-3. **Super Admin**: Always has access (bypasses check).
-4. **RBAC Module**: Hard-coded to be restricted to **Super Admins only** for security.
+### Adding a New Feature
+1. **Controller**: Create with `php artisan make:controller Admin/NameController -r`.
+2. **Routes**: Define in `routes/admin.php` inside the `check_page_permission` group.
+   - **Naming Rule**: Use kebab-case of the sub-module name (e.g., "Sale Report" -> `admin.sale-report.index`).
+3. **Seeder**: Register in `database/seeders/AdminModuleSeeder.php`.
+4. **Permissions**: Re-run `php artisan db:seed --class=AdminModuleSeeder`.
 
 ---
 
-## Development Credentials
+## 🔌 API Documentation
+
+### Postman Integration
+A complete collection is included: `dummy-ecom-api.postman_collection.json`.
+- **Import**: File > Import in Postman.
+- **Auth**: The `Login` request automatically updates the environment variable for subsequent secure requests.
+
+### Core Endpoints
+- **Public**: `POST /api/auth/login`, `GET /api/products`
+- **Protected**: `GET /api/auth/me`, `GET /api/user/orders`, `GET /api/user/dashboard`
+
+---
+
+## 🔑 Development Credentials
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
@@ -143,48 +135,5 @@ All admin routes are protected by the `CheckPagePermission` middleware.
 
 ---
 
-## License
+## 📄 License
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
----
-
-## API Documentation & Usage
-
-This project exposes JWT-secured RESTful API endpoints intended for consumption by frontend frameworks such as React or mobile applications.
-
-### API Postman Setup
-To quickly test and integrate the API, a complete **Postman Collection** is included natively within the project:
-1. Locate `dummy-ecom-api.postman_collection.json` in the root of your project directory.
-2. In Postman, go to **File > Import** and select this file.
-3. Once imported, you will get pre-configured requests under the **Dummy E-Com API** collection.
-4. **Automated Authentication**: The `Login` request natively intercepts your generated `access_token` upon a successful `200 OK` response and automatically updates your Postman environment. You do not need to manually configure the Bearer Token for subsequent secure requests (e.g., calling `/api/auth/me` or `/api/user/orders`).
-
-### Key API Endpoints
-- **Public**:
-  - `POST /api/auth/login` (Returns API JWT)
-  - `POST /api/auth/register`
-  - `GET /api/products` (Accepts `?search=` and `?page=` params)
-  - `GET /api/products/{id}`
-- **Protected (Requires JWT Bearer Token)**:
-  - `GET /api/auth/me`
-  - `POST /api/auth/logout`
-  - `GET /api/user/dashboard`
-  - `GET /api/user/orders`
-
-### JWT Implementation Details
-
-This project uses the `tymon/jwt-auth` package to manage secure API authentication.
-
-#### Configuration
-- **Guard:** The `api` guard is configured to use the `jwt` driver in `config/auth.php`.
-- **Model:** The `User` model implements the `Tymon\JWTAuth\Contracts\JWTSubject` interface, which provides the `getJWTIdentifier()` and `getJWTCustomClaims()` methods.
-- **Middleware:** Protected API routes enforce authentication using the standard `auth:api` middleware.
-
-#### Token Lifecycle
-1. **Login:** Send a `POST` request to `/api/auth/login` with your `email` and `password`. On success, the server responds with an `access_token` and the `expires_in` duration.
-2. **Usage:** Include the token in the `Authorization` header of all protected requests:
-   ```http
-   Authorization: Bearer <your_token_here>
-   ```
-3. **Refresh:** Send a `POST` request to `/api/auth/refresh` to obtain a fresh token when the existing one expires.
-4. **Logout:** Send a `POST` request to `/api/auth/logout` to invalidate the current token on the server, ensuring it can no longer be used.
