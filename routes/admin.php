@@ -77,11 +77,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::get('admin-user-role', [AdminUserRoleController::class, 'index'])->name('admin-user-role.index');
             Route::get('admin-user-role/{user}/edit', [AdminUserRoleController::class, 'edit'])->name('admin-user-role.edit');
             Route::patch('admin-user-role/{user}', [AdminUserRoleController::class, 'update'])->name('admin-user-role.update');
+
         });
 
         // Sale Report
         Route::get('sale-report', [SaleReportController::class, 'index'])->name('sale-report.index');
         Route::get('sale-report/export', [SaleReportController::class, 'export'])->name('sale-report.export');
+
+        // Notification Management
+        Route::get('notification-management', [App\Http\Controllers\Admin\NotificationSettingController::class, 'index'])->name('notification-management.index');
+        Route::put('notification-management', [App\Http\Controllers\Admin\NotificationSettingController::class, 'update'])->name('notification-management.update');
+        Route::post('notifications/mark-as-read', [App\Http\Controllers\Admin\NotificationSettingController::class, 'markAsRead'])->name('notifications.mark-as-read');
 
         // Logout
         Route::post('logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'destroy'])

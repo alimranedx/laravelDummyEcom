@@ -12,6 +12,25 @@ class Order extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected static function booted()
+    {
+        static::created(function ($order) {
+            $isEnabled = \App\Models\Setting::getSetting('sale_notification_enabled', 1);
+            if ($isEnabled) {
+                $msg = "🛍️ New Order Received! Order #{$order->id} for $" . number_format($order->total_price, 2);
+                $url = route('admin.orders.show', $order->id);
+                
+                $notification = \App\Models\AdminNotification::create([
+                    'message' => $msg,
+                    'type' => 'success',
+                    'url' => $url,
+                ]);
+
+                event(new \App\Events\SaleCreated($order, $notification));
+            }
+        });
+    }
+
     protected $fillable = ['user_id', 'guest_phone', 'total_price', 'status', 'payment_status', 'payment_method', 'shipping_address'];
 
 

@@ -14,6 +14,24 @@ class User extends Authenticatable implements JWTSubject
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, \Spatie\Permission\Traits\HasRoles;
 
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            $isEnabled = \App\Models\Setting::getSetting('user_registered_notification_enabled', 1);
+            if ($isEnabled) {
+                $msg = "👤 New User Registered! {$user->name} ({$user->email})";
+                
+                $notification = \App\Models\AdminNotification::create([
+                    'message' => $msg,
+                    'type' => 'info',
+                    'url' => '#',
+                ]);
+
+                event(new \App\Events\UserRegistered($user, $notification));
+            }
+        });
+    }
+
     public function wishlist()
     {
         return $this->hasMany(Wishlist::class);

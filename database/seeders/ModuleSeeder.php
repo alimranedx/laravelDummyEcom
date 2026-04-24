@@ -56,6 +56,15 @@ class ModuleSeeder extends Seeder
                 'created_at' => Carbon::parse('2026-02-23 09:52:54'),
                 'updated_at' => Carbon::parse('2026-02-23 09:52:54'),
             ],
+            [
+                'id' => 6,
+                'name' => 'Management',
+                'icon' => 'bi bi-sliders',
+                'sequence' => 7,
+                'display_name' => 'Management',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
         ]);
     }
 }

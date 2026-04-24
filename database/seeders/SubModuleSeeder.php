@@ -131,6 +131,18 @@ class SubModuleSeeder extends Seeder
                 'created_at' => Carbon::parse('2026-02-23 09:52:54'),
                 'updated_at' => Carbon::parse('2026-02-23 09:52:54'),
             ],
+            [
+                'id' => 11,
+                'module_id' => 6,
+                'name' => 'Notification Management',
+                'controller_name' => 'App\\Http\\Controllers\\Admin\\NotificationSettingController',
+                'icon' => 'bi bi-bell',
+                'sequence' => 1,
+                'default_method' => 'index',
+                'display_name' => 'Notification Management',
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
         ]);
     }
 }

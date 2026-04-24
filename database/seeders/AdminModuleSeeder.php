@@ -103,6 +103,18 @@ class AdminModuleSeeder extends Seeder
                     ]
                 ]
             ],
+            [
+                'name' => 'Management', 'icon' => 'bi bi-sliders', 'sequence' => 7, 'display_name' => 'Management',
+                'sub_modules' => [
+                    [
+                        'name' => 'Notification Management', 'controller' => 'App\Http\Controllers\Admin\NotificationSettingController', 'icon' => 'bi bi-bell', 'sequence' => 1, 'method' => 'index', 'display_name' => 'Notification Management',
+                        'pages' => [
+                            ['name' => 'View Notification Settings', 'method' => 'index', 'type' => 2],
+                            ['name' => 'Update Notification Settings', 'method' => 'update', 'type' => 3],
+                        ]
+                    ]
+                ]
+            ],
         ];
 
         foreach ($modules as $m) {

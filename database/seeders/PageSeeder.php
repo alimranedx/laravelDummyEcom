@@ -79,6 +79,9 @@ class PageSeeder extends Seeder
 
             ['id' => 52, 'module_id' => 5, 'sub_module_id' => 10, 'name' => 'View Sale Report', 'method_name' => 'index', 'method_type' => 2, 'created_at' => Carbon::parse('2026-02-23 09:52:54'), 'updated_at' => Carbon::parse('2026-02-23 09:52:54')],
 
+            ['id' => 53, 'module_id' => 6, 'sub_module_id' => 11, 'name' => 'View Notification Settings', 'method_name' => 'index', 'method_type' => 2, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 54, 'module_id' => 6, 'sub_module_id' => 11, 'name' => 'Update Notification Settings', 'method_name' => 'update', 'method_type' => 3, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+
         ]);
     }
 }
