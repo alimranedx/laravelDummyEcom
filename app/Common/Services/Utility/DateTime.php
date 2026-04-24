@@ -20,8 +20,8 @@ class DateTime
         $to = null;
         if (! empty($dataRange)) {
             $dateRange = explode('-', trim($dataRange));
-            $from = Carbon::parse($dateRange[0])->format('Y-m-d');
-            $to = Carbon::parse($dateRange[1])->format('Y-m-d');
+            $from = Carbon::parse(trim($dateRange[0]))->startOfDay()->format('Y-m-d H:i:s');
+            $to = Carbon::parse(trim($dateRange[1]))->endOfDay()->format('Y-m-d H:i:s');
         }
 
         return [

@@ -24,18 +24,35 @@
 
         <!-- Main Content Card -->
         <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-            <div class="card-header bg-white border-0 py-4 px-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                <h5 class="mb-0 fw-bold text-dark">Recent Orders</h5>
-                <form method="GET" action="{{ route('admin.orders.index') }}" class="search-box position-relative d-flex gap-2 w-100" style="max-width: 400px;">
-                    <div class="position-relative flex-grow-1">
-                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
-                        <input type="text" name="q" value="{{ request('q') }}" class="form-control rounded-pill ps-5 border-light bg-light w-100"
-                            placeholder="Search by Order ID or Customer...">
+            <div class="card-header bg-white border-bottom py-4 px-4">
+                <form method="GET" action="{{ route('admin.orders.index') }}" id="filterForm">
+                    <div class="row g-3 align-items-end">
+
+                        <div class="col-md-4">
+                            <label for="date_range" class="form-label small fw-bold text-muted text-uppercase mb-1">Date
+                                Range</label>
+                            <input class="form-control rounded-pill border-light bg-light" type="text" name="date_range"
+                                id="date_range" value="{{ request('date_range') }}" placeholder="Select date range" />
+                        </div>
+                        <div class="col-md-5">
+                            <label for="q" class="form-label small fw-bold text-muted text-uppercase mb-1">Search
+                                Keyword</label>
+                            <div class="position-relative">
+                                <i
+                                    class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                <input type="text" name="q" id="q"
+                                    class="form-control rounded-pill ps-5 border-light bg-light"
+                                    placeholder="Search by Order ID or Customer..." value="{{ request('q') }}">
+                            </div>
+                        </div>
+                        <div class="col-md-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary rounded-pill w-100 fw-bold">Filter</button>
+                            @if (request()->anyFilled(['q', 'date_range']))
+                                <a href="{{ route('admin.orders.index') }}"
+                                    class="btn btn-light rounded-pill border w-100 fw-bold">Clear</a>
+                            @endif
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium shadow-sm">Search</button>
-                    @if(request()->filled('q'))
-                        <a href="{{ route('admin.orders.index') }}" class="btn btn-light rounded-pill border px-3">Clear</a>
-                    @endif
                 </form>
             </div>
 
@@ -197,5 +214,41 @@
             .pagination-wrapper p.small.text-muted { display: none !important; }
             .pagination-wrapper nav>div.d-sm-flex { justify-content: flex-end !important; }
         </style>
+    @endpush
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                $('#date_range').daterangepicker({
+                    autoUpdateInput: false,
+                    showDropdowns: true,
+                    alwaysShowCalendars: true,
+                    linkedCalendars: false,
+                    locale: {
+                        format: 'YYYY/MM/DD',
+                        cancelLabel: 'Clear'
+                    },
+                    ranges: {
+                        'Today': [moment(), moment()],
+                        'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                        'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                        'This Month': [moment().startOf('month'), moment().endOf('month')],
+                        'Last Month': [
+                            moment().subtract(1, 'month').startOf('month'),
+                            moment().subtract(1, 'month').endOf('month')
+                        ]
+                    }
+                });
+
+                $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                    $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format(
+                        'YYYY/MM/DD'));
+                });
+
+                $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                    $(this).val('');
+                });
+            });
+        </script>
     @endpush
 @endsection
