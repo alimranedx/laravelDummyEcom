@@ -9,6 +9,7 @@ This is a comprehensive Laravel-based ecommerce application featuring user authe
 - **Product Management**: Brands, Categories, and Products CRUD.
 - **Sales System**: Order placement and status tracking.
 - **Admin Dashboard**: Real-time overview of the system status.
+- **Live Notifications**: Real-time admin notifications for sales and user registrations powered by Laravel Reverb WebSockets with a persistent database storage system.
 - **REST API**: Comprehensive JWT-secured endpoints for Auth, Products, and User Dashboard to easily integrate with frontend frameworks (e.g., React, Vue).
 - **Responsive UI**: Modern, premium admin interface using Bootstrap Icons and glassmorphism-inspired design.
 
@@ -69,7 +70,13 @@ php artisan serve
 ```
 The application will be available at `http://localhost:8000`.
 
-### 8. Pulling Updates from Git
+### 8. Start WebSockets Server (Reverb)
+To enable live notifications on the admin panel, you must start the Reverb server in a separate terminal:
+```bash
+php artisan reverb:start
+```
+
+### 9. Pulling Updates from Git
 When you pull new updates from the Git repository, it's crucial to update your dependencies and clear the application cache to avoid unexpected errors:
 ```bash
 git pull
