@@ -56,21 +56,32 @@ A comprehensive, production-ready Laravel ecommerce application featuring a robu
    ```
 
 3. **Broadcasting & Live Notifications (Reverb)**
-   If you are setting this up on a new machine, you need to generate fresh WebSocket keys:
+   If you are setting this up on a new machine, you need to generate fresh WebSocket keys.
+   
+   **Option A: Generate New Keys (Fresh Installation)**
+   If you want to generate brand new keys for your machine, run:
    ```bash
-   php artisan install:broadcasting --reverb
+   php artisan reverb:install
    ```
-   > [!IMPORTANT]
-   > Ensure your `.env` has the following variables populated. If they are empty, the connection will fail.
-   > ```env
-   > REVERB_APP_ID=your_id
-   > REVERB_APP_KEY=your_key
-   > REVERB_APP_SECRET=your_secret
-   > REVERB_HOST="127.0.0.1"
-   > REVERB_PORT=8081
-   > REVERB_SCHEME=http
-   > ```
+   **What this command does:**
+   - Detects your broadcasting driver.
+   - Generates a random **App ID**, **Public Key**, and **Secret**.
+   - Automatically appends these values to your `.env` file.
+   - Configures the `VITE_` versions of the keys for your frontend assets.
 
+   
+   **Option B: Manual Sync (Recommended for Multi-Device)**
+   If you already have keys on another machine, copy these values into your `.env`:
+   ```env
+   REVERB_APP_ID=784099
+   REVERB_APP_KEY=mcbjissv0g2lw9dnvfxp
+   REVERB_APP_SECRET=ghg1cbanebvagc2kz5df
+   REVERB_HOST="127.0.0.1"
+   REVERB_PORT=8081
+   REVERB_SCHEME=http
+   ```
+   > [!TIP]
+   > **REVERB_APP_KEY** is used by the Frontend. **REVERB_APP_SECRET** is used by the Backend to sign messages. If these mismatch between your Frontend and Backend, you will get a "Pusher error: Not found".
 
 4. **Database Configuration**
    - Create a database named `laravel_dummy_ecom`.
@@ -83,9 +94,11 @@ A comprehensive, production-ready Laravel ecommerce application featuring a robu
    ```
 
 6. **Compile Assets & Run**
-   Open two terminals:
-   - **Terminal 1 (App)**: `php artisan serve` and `npm run dev`
-   - **Terminal 2 (WebSockets)**: `php artisan reverb:start`
+   Open three terminals:
+   - **Terminal 1 (Backend)**: `php artisan serve`
+   - **Terminal 2 (Vite/Assets)**: `npm run dev`
+   - **Terminal 3 (WebSockets)**: `php artisan reverb:start --port=8081`
+
 
 ---
 
