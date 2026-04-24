@@ -56,10 +56,21 @@ A comprehensive, production-ready Laravel ecommerce application featuring a robu
    ```
 
 3. **Broadcasting & Live Notifications (Reverb)**
-   Generate fresh WebSocket keys for your local machine:
+   If you are setting this up on a new machine, you need to generate fresh WebSocket keys:
    ```bash
    php artisan install:broadcasting --reverb
    ```
+   > [!IMPORTANT]
+   > Ensure your `.env` has the following variables populated. If they are empty, the connection will fail.
+   > ```env
+   > REVERB_APP_ID=your_id
+   > REVERB_APP_KEY=your_key
+   > REVERB_APP_SECRET=your_secret
+   > REVERB_HOST="127.0.0.1"
+   > REVERB_PORT=8081
+   > REVERB_SCHEME=http
+   > ```
+
 
 4. **Database Configuration**
    - Create a database named `laravel_dummy_ecom`.
@@ -91,8 +102,14 @@ php artisan db:seed
 php artisan config:clear
 php artisan optimize:clear
 ```
-> [!IMPORTANT]
-> If Reverb configuration changed, remember to restart the server: `php artisan reverb:start`. Also, ensure `BROADCAST_CONNECTION=reverb` is set in your `.env`.
+### Troubleshooting Reverb (WebSockets)
+If you see `WebSocket connection failed` or `Pusher error: Not found`:
+1. **Restart the Server**: Always run `php artisan reverb:start` in a dedicated terminal.
+2. **Match Keys**: Ensure the `VITE_REVERB_*` keys in your **Frontend** `.env` exactly match your **Backend** `.env`.
+3. **Clear Cache**: Run `php artisan config:clear` and `php artisan optimize:clear`.
+4. **Check Protocol**: If your app is not using SSL locally, ensure `REVERB_SCHEME=http` and `VITE_REVERB_SCHEME=http`.
+5. **WSS Error**: If the browser tries to connect via `wss://` but you are on `http`, it's because the frontend `.env` is missing and defaulting to secure mode.
+
 
 ---
 
