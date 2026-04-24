@@ -11,6 +11,18 @@ class OrderItem extends Model
 
     protected $fillable = ['order_id', 'product_id', 'quantity', 'unit_price'];
 
+    protected $appends = ['price', 'subtotal'];
+
+    public function getPriceAttribute()
+    {
+        return $this->unit_price;
+    }
+
+    public function getSubtotalAttribute()
+    {
+        return $this->unit_price * $this->quantity;
+    }
+
     public function order()
     {
         return $this->belongsTo(Order::class);
