@@ -49,6 +49,7 @@ Route::group(['prefix' => 'products'], function ($router) {
 |--------------------------------------------------------------------------
 */
 Route::post('/guest-checkout', [\App\Http\Controllers\Api\OrderController::class, 'guestStore']);
+Route::get('/track-order/{payment_id}', [\App\Http\Controllers\Api\OrderController::class, 'track']);
 
 Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function ($router) {
     Route::get('/dashboard', [UserController::class, 'dashboard']);            // Retrieve user dashboard data/metrics

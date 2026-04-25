@@ -200,11 +200,19 @@
             <div class="card-header bg-white border-bottom py-4 px-4">
                 <form method="GET" action="{{ route('admin.sale-report.index') }}" id="filterForm">
                     <div class="row g-3 align-items-end justify-content-end">
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="form-label small fw-bold text-muted text-uppercase mb-1">Date Range</label>
                             <input class="form-control rounded-pill border-light bg-light py-2 px-4 shadow-sm" type="text" name="date_range" id="date_range" value="{{ request('date_range') }}" placeholder="YYYY/MM/DD - YYYY/MM/DD"/>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-2">
+                            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Payment ID</label>
+                            <input class="form-control rounded-pill border-light bg-light py-2 px-4 shadow-sm" type="text" name="payment_id" value="{{ request('payment_id') }}" placeholder="PAY-XXXX..."/>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold text-muted text-uppercase mb-1">Search Keyword</label>
+                            <input class="form-control rounded-pill border-light bg-light py-2 px-4 shadow-sm" type="text" name="q" value="{{ request('q') }}" placeholder="ID, Name..."/>
+                        </div>
+                        <div class="col-md-2">
                             <label class="form-label small fw-bold text-muted text-uppercase mb-1">Status Filter</label>
                             <select name="status[]" id="status_filter" class="selectpicker form-control" multiple data-actions-box="true" title="All Statuses">
                                 @foreach ($statuses as $status)
@@ -216,7 +224,7 @@
                         </div>
                         <div class="col-md-3 d-flex gap-2">
                             <button type="submit" class="btn btn-primary rounded-pill w-100 fw-bold shadow-sm py-2">Filter</button>
-                            @if (request()->anyFilled(['date_range', 'status']))
+                            @if (request()->anyFilled(['date_range', 'status', 'q', 'payment_id']))
                                 <a href="{{ route('admin.sale-report.index') }}" class="btn btn-light rounded-pill border w-100 fw-bold text-center py-2 d-flex align-items-center justify-content-center">Clear</a>
                             @endif
                         </div>
@@ -230,6 +238,7 @@
                     <thead class="bg-light text-muted small text-uppercase">
                         <tr>
                             <th class="px-4 py-3 border-0">Order ID</th>
+                            <th class="px-4 py-3 border-0">Payment ID</th>
                             <th class="px-4 py-3 border-0">Customer</th>
                             <th class="px-4 py-3 border-0">Amount</th>
                             <th class="px-4 py-3 border-0">Status</th>
@@ -240,6 +249,7 @@
                         @forelse($sales as $sale)
                             <tr class="transition-row">
                                 <td class="px-4 py-4 fw-bold text-primary small">#{{ $sale->id }}</td>
+                                <td class="px-4 py-4 small text-muted fw-medium">{{ $sale->payment_id }}</td>
                                 <td class="px-4 py-4">
                                     <div class="d-flex align-items-center">
                                         <div class="me-2 bg-light text-dark fw-bold border d-flex align-items-center justify-content-center rounded-circle"
@@ -269,7 +279,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
+                                <td colspan="6" class="text-center py-5 text-muted">
                                     <i class="bi bi-journal-x display-1 opacity-25 d-block mb-3"></i>
                                     <strong>No sales data found</strong>
                                     <p class="small mt-1">Try adjusting the filters above.</p>
@@ -332,31 +342,43 @@
     <!-- Bootstrap Select -->
     <script src="{{ asset('/assets/bootstrap-select-1.14.0-beta3/js/bootstrap-select.min.js') }}"></script>
     <script>
-        $('#date_range').daterangepicker({
-            autoUpdateInput: true,
-            showDropdowns: true,
-            alwaysShowCalendars: true,
-            autoApply: false,
-            linkedCalendars: false,
-            timePicker: true,
-
-            locale: {
-                format: 'YYYY/MM/DD'
-            },
-            ranges: {
-                'Today': [moment(), moment()],
-                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-                'This Month': [moment().startOf('month'), moment().endOf('month')],
-                'Last Month': [
-                    moment().subtract(1, 'month').startOf('month'),
-                    moment().subtract(1, 'month').endOf('month')
-                ]
-            }
-        });
-        $(function() {
+        $(document).ready(function() {
+            // Initialize Bootstrap Select
             $('.selectpicker').selectpicker();
+
+            // Initialize Date Range Picker
+            $('#date_range').daterangepicker({
+                autoUpdateInput: true,
+                showDropdowns: true,
+                alwaysShowCalendars: true,
+                autoApply: false,
+                linkedCalendars: false,
+                timePicker: false, 
+
+                locale: {
+                    format: 'YYYY/MM/DD'
+                },
+                ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [
+                        moment().subtract(1, 'month').startOf('month'),
+                        moment().subtract(1, 'month').endOf('month')
+                    ]
+                }
+            });
+
+            // Handle date range input updates
+            $('#date_range').on('apply.daterangepicker', function(ev, picker) {
+                $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
+            });
+
+            $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
+                $(this).val('');
+            });
         });
     </script>
 @endpush

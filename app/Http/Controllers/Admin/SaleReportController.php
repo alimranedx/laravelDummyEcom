@@ -36,6 +36,20 @@ class SaleReportController extends Controller
             }
         }
 
+        if ($request->filled('payment_id')) {
+            $query->where('payment_id', 'like', '%' . $request->payment_id . '%');
+        }
+
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where(function($sub) use ($q) {
+                $sub->where('id', 'like', "%{$q}%")
+                    ->orWhereHas('user', function($u) use ($q) {
+                        $u->where('name', 'like', "%{$q}%");
+                    });
+            });
+        }
+
         $per_page = $request->input('per_page', 10);
         $data['summary'] = [
             'total_revenue' => (clone $query)->sum('total_price'),
@@ -73,6 +87,20 @@ class SaleReportController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('payment_id')) {
+            $query->where('payment_id', 'like', '%' . $request->payment_id . '%');
+        }
+
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where(function($sub) use ($q) {
+                $sub->where('id', 'like', "%{$q}%")
+                    ->orWhereHas('user', function($u) use ($q) {
+                        $u->where('name', 'like', "%{$q}%");
+                    });
+            });
+        }
+
         $orders = $query->get();
         $filename = 'sale_report_' . now()->format('Y_m_d_His');
 
@@ -97,13 +125,14 @@ class SaleReportController extends Controller
             $handle = fopen('php://output', 'w');
 
             // Header row
-            fputcsv($handle, ['Order ID', 'Customer', 'Email', 'Amount', 'Status', 'Date']);
+            fputcsv($handle, ['Order ID', 'Payment ID', 'Customer', 'Email', 'Amount', 'Status', 'Date']);
 
             foreach ($orders as $order) {
                 fputcsv($handle, [
                     $order->id,
-                    $order->user->name,
-                    $order->user->email,
+                    $order->payment_id,
+                    $order->user->name ?? 'Guest',
+                    $order->user->email ?? 'N/A',
                     number_format($order->total_price, 2),
                     $order->status->label(),
                     $order->created_at->format('Y-m-d H:i:s'),
@@ -145,7 +174,7 @@ class SaleReportController extends Controller
         $xml .= '<Column ss:Width="150"/>';
 
         // Header row
-        $headers = ['Order ID', 'Customer', 'Email', 'Amount', 'Status', 'Date'];
+        $headers = ['Order ID', 'Payment ID', 'Customer', 'Email', 'Amount', 'Status', 'Date'];
         $xml .= '<Row>';
         foreach ($headers as $h) {
             $xml .= '<Cell ss:StyleID="header"><Data ss:Type="String">' . htmlspecialchars($h) . '</Data></Cell>';
@@ -156,8 +185,9 @@ class SaleReportController extends Controller
         foreach ($orders as $order) {
             $xml .= '<Row>';
             $xml .= '<Cell><Data ss:Type="Number">' . $order->id . '</Data></Cell>';
-            $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($order->user->name) . '</Data></Cell>';
-            $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($order->user->email) . '</Data></Cell>';
+            $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($order->payment_id) . '</Data></Cell>';
+            $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($order->user->name ?? 'Guest') . '</Data></Cell>';
+            $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($order->user->email ?? 'N/A') . '</Data></Cell>';
             $xml .= '<Cell ss:StyleID="currency"><Data ss:Type="Number">' . $order->total_price . '</Data></Cell>';
             $xml .= '<Cell><Data ss:Type="String">' . htmlspecialchars($order->status->label()) . '</Data></Cell>';
             $xml .= '<Cell><Data ss:Type="String">' . $order->created_at->format('Y-m-d H:i:s') . '</Data></Cell>';

@@ -164,7 +164,6 @@
         </div>
     </div>
     @push('styles')
-    <link rel="stylesheet" href="{{ asset('/assets/bootstrap-select-1.14.0-beta3/css/bootstrap-select.min.css') }}">
     <style>
         .transition-row { transition: background-color 0.2s; }
         .transition-row:hover { background-color: rgba(248,249,250,0.5); }
@@ -178,11 +177,9 @@
     </style>
     @endpush
     @push('scripts')
-        <!-- Bootstrap Select -->
-        <script src="{{ asset('/assets/bootstrap-select-1.14.0-beta3/js/bootstrap-select.min.js') }}"></script>
         <script>
             $(document).ready(function() {
-                $('.selectpicker').selectpicker();
+                // selectpicker is now initialized globally in layout.blade.php
             });
         </script>
     @endpush

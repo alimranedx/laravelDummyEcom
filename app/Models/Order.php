@@ -11,6 +11,18 @@ use Illuminate\Collection\Collection;
 class Order extends Model
 {
     use HasFactory, SoftDeletes;
+    
+    /**
+     * Generate a unique payment ID for orders.
+     */
+    public static function generateUniquePaymentId()
+    {
+        do {
+            $paymentId = 'PAY-' . strtoupper(bin2hex(random_bytes(4))) . '-' . strtoupper(bin2hex(random_bytes(2)));
+        } while (self::where('payment_id', $paymentId)->exists());
+
+        return $paymentId;
+    }
 
     protected static function booted()
     {
@@ -31,7 +43,7 @@ class Order extends Model
         });
     }
 
-    protected $fillable = ['user_id', 'guest_phone', 'total_price', 'status', 'payment_status', 'payment_method', 'shipping_address'];
+    protected $fillable = ['user_id', 'payment_id', 'guest_phone', 'total_price', 'status', 'payment_status', 'payment_method', 'shipping_address'];
 
 
     protected $casts = [
@@ -51,6 +63,17 @@ class Order extends Model
     {
         $query = self::query();
 
+        if (isset($filters['q']) && !empty($filters['q'])) {
+            $q = $filters['q'];
+            $query->where(function ($qBuilder) use ($q) {
+                $qBuilder->where('id', 'like', '%' . $q . '%')
+                      ->orWhere('payment_id', 'like', '%' . $q . '%')
+                      ->orWhereHas('user', function($userQuery) use ($q) {
+                          $userQuery->where('name', 'like', '%' . $q . '%');
+                      });
+            });
+        }
+
         if(isset($filters['date_range']) && !empty($filters['date_range'])){
             $dates = explode(' to ', $filters['date_range']);
             if(count($dates) === 2){
@@ -67,6 +90,10 @@ class Order extends Model
             }else{
                 $query->where('status', $filters['status']);
             }
+        }
+
+        if (!empty($filters['payment_id'])) {
+            $query->where('payment_id', $filters['payment_id']);
         }
 
         return $query->get();

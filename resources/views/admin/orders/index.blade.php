@@ -28,13 +28,13 @@
                 <form method="GET" action="{{ route('admin.orders.index') }}" id="filterForm">
                     <div class="row g-3 align-items-end">
 
-                        <div class="col-md-4">
-                            <label for="date_range" class="form-label small fw-bold text-muted text-uppercase mb-1">Date
-                                Range</label>
-                            <input class="form-control rounded-pill border-light bg-light" type="text" name="date_range"
-                                id="date_range" value="{{ request('date_range') }}" placeholder="Select date range" />
+                        <div class="col-md-3">
+                            <label for="payment_id" class="form-label small fw-bold text-muted text-uppercase mb-1">Payment ID</label>
+                            <input type="text" name="payment_id" id="payment_id"
+                                class="form-control rounded-pill border-light bg-light px-4"
+                                placeholder="PAY-XXXX..." value="{{ request('payment_id') }}">
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <label for="q" class="form-label small fw-bold text-muted text-uppercase mb-1">Search
                                 Keyword</label>
                             <div class="position-relative">
@@ -42,7 +42,7 @@
                                     class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                                 <input type="text" name="q" id="q"
                                     class="form-control rounded-pill ps-5 border-light bg-light"
-                                    placeholder="Search by Order ID or Customer..." value="{{ request('q') }}">
+                                    placeholder="Order ID or Customer..." value="{{ request('q') }}">
                             </div>
                         </div>
                         <div class="col-md-3 d-flex gap-2">
@@ -61,6 +61,7 @@
                     <thead class="bg-light text-muted small text-uppercase">
                         <tr>
                             <th class="px-4 py-3 border-0">Order ID</th>
+                            <th class="px-4 py-3 border-0">Payment ID</th>
                             <th class="px-4 py-3 border-0">Customer</th>
                             <th class="px-4 py-3 border-0">Total Amount</th>
                             <th class="px-4 py-3 border-0">Order Status</th>
@@ -73,6 +74,7 @@
                         @forelse($orders as $order)
                             <tr class="transition-row">
                                 <td class="px-4 py-4 fw-bold text-primary small">#{{ $order->id }}</td>
+                                <td class="px-4 py-4 small text-muted fw-medium">{{ $order->payment_id }}</td>
                                 <td class="px-4 py-4">
                                     <div class="d-flex align-items-center">
                                         <div class="avatar-circle-sm me-2 bg-gradient-secondary text-white fw-bold shadow-sm"

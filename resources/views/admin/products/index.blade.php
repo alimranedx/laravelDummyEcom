@@ -203,7 +203,6 @@
         </div>
     </div>
     @push('styles')
-        <link rel="stylesheet" href="{{ asset('/assets/bootstrap-select-1.14.0-beta3/css/bootstrap-select.min.css') }}">
         <style>
             .transition-row {
                 transition: background-color 0.2s;
@@ -238,17 +237,15 @@
         </style>
     @endpush
     @push('scripts')
-        <!-- 3. Bootstrap Select (correct version) -->
-        <script src="{{ asset('/assets/bootstrap-select-1.14.0-beta3/js/bootstrap-select.min.js') }}"></script>
-
         <!-- 4. Init -->
         <script>
             $(document).ready(function() {
-                $('.selectpicker').selectpicker();
+                // Initialize brand filter explicitly
+                $('#brand_filter').selectpicker();
 
                 // Dynamic Category Filter Based on Brand Selection
                 const initialSelectedCategories = @json((array) request('category_id', []));
-                
+
                 $('#brand_filter').on('changed.bs.select', function(e, clickedIndex, isSelected, previousValue) {
                     filterCategoriesByBrand(false);
                 });
@@ -265,16 +262,16 @@
                         success: function(response) {
                             let categorySelect = $('#category_filter');
                             let currentSelectedCategories = isInit ? initialSelectedCategories : (categorySelect.val() || []);
-                            
+
                             categorySelect.selectpicker('destroy');
-                            
+
                             let optionsHtml = '';
-                            
+
                             response.forEach(function(cat) {
                                 let isSelected = currentSelectedCategories.includes(String(cat.id)) || currentSelectedCategories.includes(Number(cat.id)) ? 'selected' : '';
                                 optionsHtml += `<option value="${cat.id}" data-brand-id="${cat.brand_id}" ${isSelected}>${cat.name}</option>`;
                             });
-                            
+
                             categorySelect.html(optionsHtml);
                             categorySelect.selectpicker();
                         },

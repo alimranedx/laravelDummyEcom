@@ -183,7 +183,11 @@
                                 {{ ucfirst($order->payment_status) }}
                             </span>
                         </div>
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-between mb-3 border-bottom pb-2 border-light">
+                            <span class="text-muted small">Payment ID:</span>
+                            <span class="text-dark small fw-bold">{{ $order->payment_id }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 border-bottom pb-2 border-light">
                             <span class="text-muted small">Placement Date:</span>
                             <span class="text-dark small fw-medium">{{ $order->created_at->format('M d, Y H:i') }}</span>
                         </div>

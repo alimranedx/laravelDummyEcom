@@ -38,7 +38,15 @@ class UserController extends Controller
     public function orders(Request $request)
     {
         $user = auth('api')->user();
-        $orders = $user->orders()->latest()->paginate(10);
+        $q = $request->input('q');
+
+        $query = $user->orders()->latest();
+
+        if (!empty($q)) {
+            $query->where('payment_id', 'like', '%' . $q . '%');
+        }
+
+        $orders = $query->paginate(10);
 
         return response()->json($orders);
     }

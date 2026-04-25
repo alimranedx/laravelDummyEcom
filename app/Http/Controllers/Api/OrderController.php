@@ -60,6 +60,7 @@ class OrderController extends Controller
 
                 $order = Order::create([
                     'user_id' => $user->id,
+                    'payment_id' => Order::generateUniquePaymentId(),
                     'total_price' => $totalPrice,
                     'status' => OrderStatus::PENDING,
                     'payment_status' => 'pending',
@@ -131,6 +132,7 @@ class OrderController extends Controller
 
                 $order = Order::create([
                     'user_id'          => null,
+                    'payment_id'       => Order::generateUniquePaymentId(),
                     'guest_phone'      => $request->guest_phone,
                     'total_price'      => $totalPrice,
                     'status'           => OrderStatus::PENDING,
@@ -182,34 +184,73 @@ class OrderController extends Controller
     }
 
     /**
+     * Track order by payment_id (Public).
+     */
+    public function track($payment_id)
+    {
+        $order = Order::with('items.product')
+            ->where('payment_id', $payment_id)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No order found with this Payment ID'
+            ], 404);
+        }
+
+        // Clean up data for public tracking if necessary (optional)
+        // $order->makeHidden(['user_id', 'shipping_address']); 
+
+        return response()->json([
+            'success' => true,
+            'data' => $order
+        ]);
+    }
+
+    /**
      * Cancel a pending order.
      */
     public function cancel($id)
     {
         $user = auth('api')->user();
-        $order = Order::where('user_id', $user->id)
-            ->find($id);
+        
+        try {
+            return DB::transaction(function () use ($user, $id) {
+                $order = Order::with('items.product')
+                    ->where('user_id', $user->id)
+                    ->lockForUpdate()
+                    ->find($id);
 
-        if (!$order) {
+                if (!$order) {
+                    throw new \Exception('Order not found', 404);
+                }
+
+                if ($order->status !== OrderStatus::PENDING) {
+                    throw new \Exception("Order cannot be cancelled as it is already {$order->status->value}", 400);
+                }
+
+                // Update order status
+                $order->update(['status' => OrderStatus::CANCELLED]);
+
+                // Restore stock for each item
+                foreach ($order->items as $item) {
+                    if ($item->product) {
+                        $item->product->increment('stock', $item->quantity);
+                    }
+                }
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order cancelled successfully and stock restored',
+                    'data' => $order->fresh('items.product')
+                ]);
+            });
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Order not found'
-            ], 404);
+                'message' => $e->getMessage()
+            ], $e->getCode() ?: 400);
         }
-
-        if ($order->status !== OrderStatus::PENDING) {
-            return response()->json([
-                'success' => false,
-                'message' => "Order cannot be cancelled as it is already {$order->status->value}"
-            ], 400);
-        }
-
-        $order->update(['status' => OrderStatus::CANCELLED]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Order cancelled successfully',
-            'data' => $order
-        ]);
     }
 }

@@ -12,9 +12,10 @@
     <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
     <link rel="stylesheet" href="{{ asset('/assets/bootstrap-5.3.8-dist/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="{{ asset('assets/bootstrap-select-1.14.0-beta3/css/bootstrap-select.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin-theme.css') }}">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     @stack('styles')
 </head>
 
@@ -239,6 +240,7 @@
     <script src="{{ asset('/assets/bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="{{ asset('assets/bootstrap-select-1.14.0-beta3/js/bootstrap-select.min.js') }}"></script>
     
     <!-- Toast Container for Notifications -->
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1055;">
@@ -356,14 +358,22 @@
 
             // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
-                if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                if (dropdownBtn && !dropdownBtn.contains(e.target) && dropdownMenu && !dropdownMenu.contains(e.target)) {
                     dropdownMenu.classList.remove('show');
                     dropdownBtn.setAttribute('aria-expanded', 'false');
                 }
             });
         });
-    </script>
+
     @stack('scripts')
+    <script>
+        // Global Selectpicker Initialization - Fired after all page scripts
+        $(document).ready(function() {
+            if ($.fn.selectpicker) {
+                $('.selectpicker').selectpicker();
+            }
+        });
+    </script>
 </body>
 
 </html>

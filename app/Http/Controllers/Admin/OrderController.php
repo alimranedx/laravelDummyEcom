@@ -23,6 +23,10 @@ class OrderController extends Controller
             }
         }
         
+        if ($request->filled('payment_id')) {
+            $query->where('payment_id', 'like', '%' . $request->payment_id . '%');
+        }
+
         if (!empty($q)) {
             $query->where(function ($qBuilder) use ($q) {
                 $qBuilder->where('id', 'like', '%' . $q . '%')

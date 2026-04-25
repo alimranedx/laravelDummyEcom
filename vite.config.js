@@ -8,4 +8,12 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    css: {
+        preprocessorOptions: {
+            scss: {
+                quietDeps: true,
+                silenceDeprecations: ['color-functions', 'import', 'global-builtin'],
+            },
+        },
+    },
 });
