@@ -43,7 +43,10 @@ class UserController extends Controller
         $query = $user->orders()->latest();
 
         if (!empty($q)) {
-            $query->where('payment_id', 'like', '%' . $q . '%');
+            $query->where(function($query) use ($q) {
+                $query->where('id', 'like', '%' . $q . '%')
+                      ->orWhere('payment_id', 'like', '%' . $q . '%');
+            });
         }
 
         $orders = $query->paginate(10);

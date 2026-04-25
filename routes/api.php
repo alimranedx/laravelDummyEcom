@@ -48,7 +48,6 @@ Route::group(['prefix' => 'products'], function ($router) {
 | Guest Checkout (Cash on Delivery - No Login Required)
 |--------------------------------------------------------------------------
 */
-Route::post('/guest-checkout', [\App\Http\Controllers\Api\OrderController::class, 'guestStore']);
 Route::get('/track-order/{payment_id}', [\App\Http\Controllers\Api\OrderController::class, 'track']);
 
 Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function ($router) {
@@ -63,7 +62,9 @@ Route::group(['prefix' => 'user', 'middleware' => 'auth:api'], function ($router
     });
 
     // Checkout / Order Routes
-    Route::post('/checkout', [\App\Http\Controllers\Api\OrderController::class, 'store']);
     Route::get('/orders/{id}', [\App\Http\Controllers\Api\OrderController::class, 'show']);
     Route::post('/orders/{id}/cancel', [\App\Http\Controllers\Api\OrderController::class, 'cancel']);
 });
+
+// Unified Checkout (Publicly accessible, handles both Auth and Guest)
+Route::post('/checkout', [\App\Http\Controllers\Api\OrderController::class, 'store']);

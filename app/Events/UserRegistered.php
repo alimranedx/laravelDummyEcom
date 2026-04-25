@@ -27,6 +27,14 @@ class UserRegistered implements ShouldBroadcastNow
     }
 
     /**
+     * The event's broadcast name.
+     */
+    public function broadcastAs(): string
+    {
+        return 'UserRegistered';
+    }
+
+    /**
      * Get the channels the event should broadcast on.
      *
      * @return array<int, Channel>

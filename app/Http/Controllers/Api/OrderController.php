@@ -15,22 +15,30 @@ class OrderController extends Controller
 {
     /**
      * Process a new order (Checkout).
+     * Handles both authenticated users and guests.
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $user = auth('api')->user();
+
+        $rules = [
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
             'shipping_address' => 'required|string',
             'payment_method' => 'required|string',
-        ]);
+        ];
+
+        // If guest, require phone number
+        if (!$user) {
+            $rules['guest_phone'] = 'required|string|min:7|max:20';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
-
-        $user = auth('api')->user();
 
         try {
             return DB::transaction(function () use ($request, $user) {
@@ -59,7 +67,8 @@ class OrderController extends Controller
                 }
 
                 $order = Order::create([
-                    'user_id' => $user->id,
+                    'user_id' => $user ? $user->id : null,
+                    'guest_phone' => $user ? null : $request->guest_phone,
                     'payment_id' => Order::generateUniquePaymentId(),
                     'total_price' => $totalPrice,
                     'status' => OrderStatus::PENDING,
@@ -73,9 +82,11 @@ class OrderController extends Controller
                     OrderItem::create($orderItem);
                 }
 
+                $message = $user ? 'Order processed successfully' : 'Order placed successfully! We will contact you on ' . $request->guest_phone . ' to confirm delivery.';
+
                 return response()->json([
                     'success' => true,
-                    'message' => 'Order processed successfully',
+                    'message' => $message,
                     'data' => $order->load('items.product')
                 ], 201);
             });
@@ -87,78 +98,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Guest Checkout — Cash on Delivery (no login required).
-     * Only requires phone number + shipping address.
-     */
-    public function guestStore(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'items'            => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'guest_phone'      => 'required|string|min:7|max:20',
-            'shipping_address' => 'required|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
-
-        try {
-            return DB::transaction(function () use ($request) {
-                $totalPrice = 0;
-                $orderItems = [];
-
-                foreach ($request->items as $item) {
-                    $product = Product::lockForUpdate()->find($item['product_id']);
-
-                    if ($product->stock < $item['quantity']) {
-                        throw new \Exception("Product '{$product->name}' is out of stock or insufficient quantity.");
-                    }
-
-                    $unitPrice   = $product->price;
-                    $subTotal    = $unitPrice * $item['quantity'];
-                    $totalPrice += $subTotal;
-
-                    $orderItems[] = [
-                        'product_id' => $product->id,
-                        'quantity'   => $item['quantity'],
-                        'unit_price' => $unitPrice,
-                    ];
-
-                    $product->decrement('stock', $item['quantity']);
-                }
-
-                $order = Order::create([
-                    'user_id'          => null,
-                    'payment_id'       => Order::generateUniquePaymentId(),
-                    'guest_phone'      => $request->guest_phone,
-                    'total_price'      => $totalPrice,
-                    'status'           => OrderStatus::PENDING,
-                    'payment_status'   => 'pending',
-                    'payment_method'   => 'Cash on Delivery',
-                    'shipping_address' => $request->shipping_address,
-                ]);
-
-                foreach ($orderItems as $orderItem) {
-                    $orderItem['order_id'] = $order->id;
-                    OrderItem::create($orderItem);
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Order placed successfully! We will contact you on ' . $request->guest_phone . ' to confirm delivery.',
-                    'data'    => $order->load('items.product')
-                ], 201);
-            });
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
-    }
 
     /**
      * Get details of a single order.

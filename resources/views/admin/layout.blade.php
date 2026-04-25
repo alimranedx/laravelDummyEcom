@@ -254,116 +254,15 @@
         </div>
     </div>
 
-    <script type="module">
-        document.addEventListener('DOMContentLoaded', function () {
-            let unreadCount = {{ $unreadCount }};
+    <!-- Data for JS -->
+    <div id="notification-data" 
+         data-unread-count="{{ $unreadCount }}" 
+         data-mark-as-read-url="{{ route('admin.notifications.mark-as-read') }}" 
+         data-csrf-token="{{ csrf_token() }}" 
+         style="display: none;">
+    </div>
 
-            if (window.Echo) {
-                window.Echo.channel('admin-notifications')
-                    .listen('SaleCreated', (e) => {
-                        showToast(e.notification.message, 'success');
-                        addNotificationToDropdown(e.notification.message, 'success', e.notification.url);
-                    })
-                    .listen('UserRegistered', (e) => {
-                        showToast(e.notification.message, 'info');
-                        addNotificationToDropdown(e.notification.message, 'info', e.notification.url);
-                    });
-            }
-
-            function showToast(message, type) {
-                const toastEl = document.getElementById('liveToast');
-                const toastMessage = document.getElementById('toastMessage');
-                
-                toastEl.className = `toast align-items-center border-0 text-bg-${type}`;
-                toastMessage.innerText = message;
-                
-                const toast = new bootstrap.Toast(toastEl);
-                toast.show();
-            }
-
-            function addNotificationToDropdown(message, type, url = '#') {
-                const noNotificationsMsg = document.getElementById('noNotificationsMsg');
-                if (noNotificationsMsg) {
-                    noNotificationsMsg.remove();
-                }
-
-                const list = document.getElementById('notificationList');
-                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                
-                const item = document.createElement(url !== '#' ? 'a' : 'li');
-                if (url !== '#') {
-                    item.href = url;
-                }
-                item.className = 'px-3 py-2 border-bottom d-flex align-items-start dropdown-item text-wrap text-decoration-none';
-                item.innerHTML = `
-                    <div class="me-2 text-${type}"><i class="bi bi-bell-fill"></i></div>
-                    <div>
-                        <div class="small text-dark fw-medium">${message}</div>
-                        <div class="text-muted" style="font-size: 0.75rem;">${time}</div>
-                    </div>
-                `;
-                
-                // Add to list right after the header
-                list.insertBefore(item, list.children[1]);
-
-                // Maintain max 10 items (header is index 0, so max index is 10)
-                if (list.children.length > 11) {
-                    list.removeChild(list.lastElementChild);
-                }
-
-                // Update badge
-                unreadCount++;
-                const badge = document.getElementById('notificationBadge');
-                badge.style.display = 'inline-block';
-            }
-
-            // Initialize manual dropdown toggle to avoid Bootstrap double-loading conflicts
-            const dropdownBtn = document.getElementById('notificationDropdown');
-            const dropdownMenu = document.getElementById('notificationList');
-
-            dropdownBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const isShown = dropdownMenu.classList.contains('show');
-                
-                if (isShown) {
-                    dropdownMenu.classList.remove('show');
-                    dropdownBtn.setAttribute('aria-expanded', 'false');
-                } else {
-                    dropdownMenu.classList.add('show');
-                    dropdownBtn.setAttribute('aria-expanded', 'true');
-                    
-                    if (unreadCount > 0) {
-                        // Reset count when opening
-                        unreadCount = 0;
-                        document.getElementById('notificationBadge').style.display = 'none';
-                        
-                        // Remove unread styling
-                        document.querySelectorAll('.unread-indicator').forEach(el => el.remove());
-                        document.querySelectorAll('.notification-item .fw-bold').forEach(el => el.classList.remove('fw-bold'));
-
-                        // Mark as read in backend
-                        fetch("{{ route('admin.notifications.mark-as-read') }}", {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Accept': 'application/json'
-                            }
-                        });
-                    }
-                }
-            });
-
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (dropdownBtn && !dropdownBtn.contains(e.target) && dropdownMenu && !dropdownMenu.contains(e.target)) {
-                    dropdownMenu.classList.remove('show');
-                    dropdownBtn.setAttribute('aria-expanded', 'false');
-                }
-            });
-        });
+    @stack('scripts')
 
     @stack('scripts')
     <script>
